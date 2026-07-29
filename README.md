@@ -43,6 +43,19 @@ Le jeton est conservé dans `localStorage` de ce navigateur afin de permettre un
 
 En production, servez obligatoirement l’application en HTTPS et Home Assistant en HTTPS/WSS. Évitez les certificats auto-signés non approuvés par l’iPad, car le navigateur bloquera le WebSocket sécurisé.
 
+## Connexion Spotify
+
+Sillage contrôle Spotify directement depuis le navigateur, via OAuth avec PKCE : il n’y a donc **aucun client secret** à créer, saisir ou publier. Un compte Spotify Premium est nécessaire pour le contrôle de lecture.
+
+1. Ouvrez le [tableau de bord Spotify for Developers](https://developer.spotify.com/dashboard), créez une application puis copiez son **Client ID**.
+2. Dans les paramètres de l’application Spotify, ajoutez l’URL de redirection exacte de Sillage, suivie de `/callback` :
+   - en local : `http://127.0.0.1:5173/callback` ;
+   - en production : `https://votre-domaine.example/callback`.
+3. Indiquez le Client ID dans **Réglages → Spotify** de Sillage, ou définissez `VITE_SPOTIFY_CLIENT_ID` dans `.env.local` avant de lancer la construction.
+4. Cliquez sur **Connecter mon compte**, acceptez les autorisations Spotify, puis choisissez un appareil de lecture actif (enceinte, téléphone, etc.) dans la page Musique.
+
+Spotify n’accepte pas de redirection HTTP hors de l’adresse de boucle locale. Pour un iPad servi en HTTP sur le réseau local, connectez d’abord le compte depuis `http://127.0.0.1:5173`, puis copiez le **jeton à reporter sur vos autres écrans** affiché dans les Réglages de Sillage et collez-le sur l’iPad. Préférez néanmoins un déploiement HTTPS.
+
 ## Mode démo
 
 Le mode démo est intégré, ne contacte aucun service et fournit météo, Tempo, températures, thermostat, volets, Spotify et mises à jour simulés. Les contrôles modifient les données locales pour valider l’expérience sans instance Home Assistant.
