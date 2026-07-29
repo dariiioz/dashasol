@@ -1,0 +1,2 @@
+import type { SVGProps } from 'react';
+export function RadiatorIcon(props: SVGProps<SVGSVGElement>) { return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" {...props}><path d="M5 9.5h14v9H5zM8 12v4.5M12 12v4.5M16 12v4.5M6.5 19v2M17.5 19v2M8 6.5c0-1 .7-1.4 1.1-2.1.4-.6.1-1.2-.3-1.7M12 6.5c0-1 .7-1.4 1.1-2.1.4-.6.1-1.2-.3-1.7M16 6.5c0-1 .7-1.4 1.1-2.1.4-.6.1-1.2-.3-1.7" /></svg>; }

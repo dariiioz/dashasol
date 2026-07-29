@@ -1,0 +1,3 @@
+import { CloudOff, Link2, LoaderCircle, ShieldAlert } from 'lucide-react';
+import { useAppStore } from '../stores/appStore';
+export function StatusPill() { const status = useAppStore(s => s.connection); const demo = useAppStore(s => s.demo); if (demo) return <span className="status demo">Démo</span>; const dictionary = { connected: ['Connectée', Link2], reconnecting: ['Reconnexion', LoaderCircle], connecting: ['Connexion', LoaderCircle], offline: ['Hors ligne', CloudOff], auth_error: ['Jeton refusé', ShieldAlert], error: ['Erreur', CloudOff], idle: ['Non connectée', CloudOff] } as const; const [label, Icon] = dictionary[status]; return <span className={`status ${status}`}><Icon size={14} />{label}</span>; }
