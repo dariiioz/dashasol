@@ -20,7 +20,9 @@ npm run build
 
 - `src/services/home-assistant` : protocole WebSocket, authentification, synchronisation, événements et normalisation.
 - `src/stores` : configuration versionnée et état léger Zustand.
-- `src/features` : onboarding, accueil, températures, chauffage, volets, musique et réglages.
+- `src/services/assistant` : instantané de la maison, outils autorisés et dictée vocale de l’assistant.
+- `src/services/openrouter` : appel des modèles OpenRouter avec appels d’outils.
+- `src/features` : onboarding, accueil, assistant vocal, températures, chauffage, volets, musique et réglages.
 - `src/components`, `src/hooks`, `src/utils`, `src/types` : éléments partagés et types stricts.
 
 Les pages secondaires sont chargées paresseusement. Les états entrants remplacent uniquement l’entité concernée, ce qui évite de reconstruire l’ensemble des données à chaque événement `state_changed`. L’accueil s’abonne entité par entité plutôt qu’à la table complète, et la configuration n’est réécrite dans `localStorage` que lorsqu’elle change réellement : un écran allumé en permanence ne doit pas écrire à chaque événement de la maison.
@@ -55,6 +57,24 @@ Sillage contrôle Spotify directement depuis le navigateur, via OAuth avec PKCE 
 4. Cliquez sur **Connecter mon compte**, acceptez les autorisations Spotify, puis choisissez un appareil de lecture actif (enceinte, téléphone, etc.) dans la page Musique.
 
 Spotify n’accepte pas de redirection HTTP hors de l’adresse de boucle locale. Pour un iPad servi en HTTP sur le réseau local, connectez d’abord le compte depuis `http://127.0.0.1:5173`, puis copiez le **jeton à reporter sur vos autres écrans** affiché dans les Réglages de Sillage et collez-le sur l’iPad. Préférez néanmoins un déploiement HTTPS.
+
+## Assistant vocal
+
+L’écran d’accueil porte un bouton **Assistant vocal** : on parle, la maison répond et agit. La dictée et la lecture à voix haute utilisent la reconnaissance vocale du navigateur ; la compréhension passe par [OpenRouter](https://openrouter.ai), avec le modèle **DeepSeek** de votre choix (`deepseek/deepseek-chat` par défaut, modifiable dans les Réglages).
+
+1. Créez une clé sur [openrouter.ai/keys](https://openrouter.ai/keys).
+2. Collez-la dans **Réglages → OpenRouter**, ajustez le modèle si besoin, puis **Tester le modèle** pour vérifier la paire clé/modèle par un vrai aller-retour.
+3. Sur l’accueil, touchez **Assistant vocal**, parlez, puis touchez à nouveau le micro pour envoyer. Un champ de saisie reste disponible pour les navigateurs sans dictée.
+
+L’assistant ne voit que les équipements sélectionnés dans **Réglages → Équipements affichés**, sous les noms que vous leur avez donnés, plus la météo et l’heure. Il peut régler une consigne de chauffage, changer un mode, positionner un volet, piloter la lecture d’une enceinte et déclencher vos commandes rapides. Tout identifiant qu’il inventerait est refusé avant d’atteindre Home Assistant, et une consigne de température est ramenée entre 7 et 30 °C : le modèle propose, Sillage dispose.
+
+La clé OpenRouter est un secret, contrairement au Client ID Spotify. Elle vit dans le `localStorage` de cet appareil, n’est envoyée qu’à OpenRouter et n’apparaît ni dans les logs ni dans le dépôt. Chaque question transmet l’état des équipements affichés : c’est ce qui permet de répondre « il fait 19 degrés dans la chambre », et cela sort de votre réseau. En mode démo, l’assistant raisonne sur la maison simulée et n’envoie aucune commande.
+
+Le micro exige un contexte sécurisé, c’est-à-dire HTTPS **ou** la boucle locale. En développement sur `http://localhost:5173` et `http://127.0.0.1:5173` la dictée fonctionne donc normalement ; c’est l’adresse réseau du serveur Vite (`http://192.168.x.x:5173`), celle par laquelle l’iPad accède à la machine, qui est refusée par le navigateur. Sillage détecte le cas, désactive le micro et l’explique plutôt que de laisser croire à un refus de permission. Pour dicter depuis l’iPad, servez l’application en HTTPS.
+
+Firefox n’implémente pas la reconnaissance vocale : la saisie écrite y reste le seul chemin. Chrome, Edge et Safari envoient l’audio à un service en ligne pour le transcrire — une maison coupée d’Internet garde ses volets, pas sa dictée.
+
+Le cadran de l’assistant réagit aux mots que la reconnaissance renvoie, et non à un second flux micro : deux captations simultanées se disputent la même entrée, et la dictée revient vide pendant que le cadran, lui, danse. Une visualisation ne doit jamais prendre le micro à la fonction qu’elle illustre. La synthèse vocale exige elle aussi une interaction préalable, ce que le geste sur le micro fournit.
 
 ## Mode démo
 

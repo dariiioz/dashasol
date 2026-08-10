@@ -12,6 +12,8 @@ export interface DashboardEntityConfig { temperatureEntities: EntitySelection[];
 export interface SpotifyConfig { clientId?: string; refreshToken?: string; pinned?: PinnedPlaylist[] }
 /** Playlists the household pinned to the shelf, kept locally so they survive a Spotify library reshuffle. */
 export interface PinnedPlaylist { uri: string; name: string; cover?: string; tracks?: number }
+/** OpenRouter is called straight from the browser: one key, one model id, and nothing else to configure. */
+export interface AssistantConfig { apiKey?: string; model?: string; voice?: boolean }
 export interface HassRegistries { entities: Array<Record<string, unknown>>; devices: Array<Record<string, unknown>>; areas: Array<Record<string, unknown>> }
 export interface RoomConfig { id: string; name: string; temperature?: string; humidity?: string; climate?: string; cover?: string; order: number; hidden?: boolean }
 export interface AppPreferences { theme: 'dark' | 'light' | 'auto'; hour12: boolean; reducedMotion: boolean; autoHomeSeconds: number; confirmGlobalActions: boolean; showUnavailable: boolean; startupPage: Page }
