@@ -15,7 +15,7 @@ export function MediaPage() {
   const current = source ?? (player.connected ? 'spotify' : haIds[0]);
   const sources = [...(player.connected ? [{ id: 'spotify', label: 'Spotify' }] : []), ...haIds.map(id => ({ id, label: name(entities[id] ?? id) }))];
   const entity = current && current !== 'spotify' ? entities[current] : undefined;
-  return <section className="page media-page"><header className="page-heading"><div><p className="eyebrow">{current === 'spotify' ? player.now?.device ? `Spotify · ${player.now.device}` : 'Spotify' : entity ? `Lecture dans ${name(entity)}` : 'Son & présence'}</p><h1>La maison<br /><em>en musique.</em></h1></div>{sources.length > 1 && <div className="global-actions">{sources.map(item => <button key={item.id} className={item.id === current ? 'selected' : ''} aria-pressed={item.id === current} onClick={() => setSource(item.id)}>{item.label}</button>)}</div>}</header>
+  return <section className="page media-page"><header className="page-heading"><div><p className="eyebrow">{current === 'spotify' ? player.now?.device ? `Spotify · ${player.now.device}` : 'Spotify' : entity ? `Lecture dans ${name(entity)}` : 'Son & présence'}</p><h1>La maison, <em>en musique.</em></h1></div>{sources.length > 1 && <div className="global-actions">{sources.map(item => <button key={item.id} className={item.id === current ? 'selected' : ''} aria-pressed={item.id === current} onClick={() => setSource(item.id)}>{item.label}</button>)}</div>}</header>
     {current === 'spotify' ? <><SpotifyPlayer player={player} /><SpotifyBrowser player={player} /></> : entity ? <HomeAssistantPlayer entity={entity} /> : <SpotifyInvitation player={player} />}
   </section>;
 }
