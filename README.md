@@ -90,6 +90,21 @@ La page **Températures** affiche les courbes des capteurs sélectionnés sur **
 
 Le mode démo fournit une puissance variable et des courbes simulées, identifiées comme telles.
 
+## Votre maison
+
+La branche `codex/maison-personnalisee` adapte le tableau de bord aux équipements découverts de cette installation. La page **Maison** réunit les fonctions suivantes :
+
+- **Linky / LiXee** : détection de `sensor.lixee_sinsts`, affichage en VA/kVA et historique sur 24 h. CCASN/CCAIN restent des points de courbe de charge en W, identifiés par leur nom d’entité dans les réglages.
+- **Énergie / Tempo** : consommation depuis minuit, six index couleur/HP/HC, période tarifaire et prochain changement. Le coût journalier hors abonnement utilise les six tarifs TTC saisis dans **Mes tarifs Tempo**. Aucun prix n’est prérempli. Un index absent, interrompu ou remis à zéro empêche le calcul ; les capteurs de coûts cumulés sont affichés séparément.
+- **Confort** : association automatique des sondes `*_temperature` et `*_humidity`, historique température ou humidité sur 6 h, 24 h ou 7 jours et comparaison avec les seuils d’humidité déjà configurés dans Home Assistant.
+- **Alertes locales** : batteries faibles, cabanon ouvert, réseau Zigbee déconnecté et capteurs/volets indisponibles. Aucune notification externe n’est envoyée.
+- **Volets** : ouverture et fermeture par étage via les scripts existants, avec confirmation et blocage hors connexion ; état de l’automatisation du coucher de soleil et prochain coucher.
+- **Météo** : prochaine pluie, risques pluie/gel/neige, précipitations et vigilance départementale.
+- **Courses** : lecture de `todo.liste_dachats`, ajout et validation par identifiant unique via les services Home Assistant ; actualisation chaque minute pendant la consultation. Les brouillons sont conservés en cas d’échec.
+- **Maintenance** : sauvegardes et ensemble des mises à jour détectées. La page Musique propose le Freebox Player POP quand aucun lecteur n’a été sélectionné.
+
+Les identifiants spécifiques à cette installation sont réunis dans `src/utils/household.ts`. Les prises du bureau et les nouveaux contrôles de chauffage sont exclus de cette adaptation. Les commandes réelles des équipements ne sont pas exécutées pendant la validation.
+
 ## Mode démo
 
 Le mode démo est intégré, ne contacte aucun service et fournit météo, Tempo, températures, thermostat, volets, Spotify et mises à jour simulés. Les contrôles modifient les données locales pour valider l’expérience sans instance Home Assistant.

@@ -11,7 +11,8 @@ import { selectedIds } from '../../utils/dashboard';
 import type { HassEntity } from '../../types/homeAssistant';
 const deviceIcon = (type: string) => type === 'Smartphone' ? Smartphone : type === 'Computer' ? Laptop2 : Speaker;
 export function MediaPage() {
-  const haIds = selectedIds(useAppStore(s => s.dashboard.mediaEntities)); const entities = useAppStore(s => s.entities); const name = useEntityName();
+  const selected = selectedIds(useAppStore(s => s.dashboard.mediaEntities)); const entities = useAppStore(s => s.entities);
+  const haIds = selected.length ? selected : entities['media_player.freebox_player_pop'] ? ['media_player.freebox_player_pop'] : []; const name = useEntityName();
   const player = useSpotifyPlayer(true); const [source, setSource] = useState<string>();
   const current = source ?? (player.connected ? 'spotify' : haIds[0]);
   const sources = [...(player.connected ? [{ id: 'spotify', label: 'Spotify' }] : []), ...haIds.map(id => ({ id, label: name(entities[id] ?? id) }))];

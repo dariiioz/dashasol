@@ -11,13 +11,12 @@ beforeEach(() => {
   useAppStore.getState().setPreferences({ confirmGlobalActions: false });
 });
 afterEach(cleanup);
-it('summarizes only selected equipment and hides unselected updates', () => {
+it('summarizes only selected equipment and discovers all available maintenance updates', () => {
   const dashboard = useAppStore.getState().dashboard;
   useAppStore.getState().setDashboard({ ...dashboard, coverEntities: [{ entityId: 'cover.volet_chambre', enabled: true, order: 0 }], climateEntities: [], updateEntities: [] });
   const { container } = render(<HomePage />);
   expect(container.querySelector('.summary-numbers')?.textContent).toContain('0volets ouvertsReposchauffage');
-  expect((screen.getByRole('button', { name: /Tout est calme/ }) as HTMLButtonElement).disabled).toBe(true);
-  expect(screen.queryByRole('button', { name: /mises à jour/ })).toBeNull();
+  expect((screen.getByRole('button', { name: /2 mises à jour/ }) as HTMLButtonElement).disabled).toBe(false);
 });
 it('opens the simulated upper floor covers from a quick command', async () => {
   render(<HomePage />);
