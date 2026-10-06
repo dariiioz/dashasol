@@ -1,3 +1,4 @@
+import { PagedItems } from '../../components/TouchPager';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useAppStore } from '../../stores/appStore';
 import { getHomeAssistantClient, callHomeAssistantService } from '../../hooks/useHomeAssistant';
@@ -43,7 +44,7 @@ export function ShoppingList() {
     {error && <p className="house-error" role="alert">{error}</p>}
     {!ready && <p className="muted">Reconnectez Home Assistant pour modifier les courses.</p>}
     {loading && <p role="status" className="history-note">Chargement des courses…</p>}
-    <ul className="shopping-items">{[...items].sort((a, b) => Number(a.status === 'completed') - Number(b.status === 'completed')).map(item => <li key={item.uid}><label><input type="checkbox" checked={item.status === 'completed'} disabled={busy || !ready} onChange={() => void change('update_item', { item: item.uid, status: item.status === 'completed' ? 'needs_action' : 'completed' })} /><span className={item.status === 'completed' ? 'completed' : ''}>{item.summary}</span></label></li>)}</ul>
+    <div className="shopping-items"><PagedItems size={5}>{[...items].sort((a, b) => Number(a.status === 'completed') - Number(b.status === 'completed')).map(item => <div key={item.uid}><label><input type="checkbox" checked={item.status === 'completed'} disabled={busy || !ready} onChange={() => void change('update_item', { item: item.uid, status: item.status === 'completed' ? 'needs_action' : 'completed' })} /><span className={item.status === 'completed' ? 'completed' : ''}>{item.summary}</span></label></div>)}</PagedItems></div>
     {!loading && !error && !items.length && <p className="muted">La liste est vide. Ajoutez votre premier article.</p>}
   </section>;
 }

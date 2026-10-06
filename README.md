@@ -105,6 +105,10 @@ La branche `codex/maison-personnalisee` adapte le tableau de bord aux équipemen
 
 Les identifiants spécifiques à cette installation sont réunis dans `src/utils/household.ts`. Les prises du bureau et les nouveaux contrôles de chauffage sont exclus de cette adaptation. Les commandes réelles des équipements ne sont pas exécutées pendant la validation.
 
+### Utilisation tactile sur iPad
+
+L’interface occupe la hauteur disponible sans défilement vertical de page. **Maison** et **Réglages** sont divisés en écrans horizontaux : balayez au doigt ou utilisez les onglets et les flèches. Les longues listes de courses, alertes, mises à jour et noms d’entités disposent de pages ; la sélection des équipements défile horizontalement. Les mises en page sont vérifiées en portrait (768 × 1024) et paysage (1024 × 768).
+
 ## Mode démo
 
 Le mode démo est intégré, ne contacte aucun service et fournit météo, Tempo, températures, thermostat, volets, Spotify et mises à jour simulés. Les contrôles modifient les données locales pour valider l’expérience sans instance Home Assistant.
