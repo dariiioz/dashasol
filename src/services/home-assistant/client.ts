@@ -11,8 +11,8 @@ const toWebsocketUrl = (url: string) => {
 
 /** Browser-only Home Assistant websocket protocol client. Never logs credentials. */
 export class HomeAssistantClient {
-  static pingInterval = 30_000; static pongTimeout = 10_000;
-  private socket?: WebSocket; private nextId = 1; private pending = new Map<number, { resolve: (value: unknown) => void; reject: (reason: Error) => void }>();
+  static pingInterval = 30_000; static pongTimeout = 10_000; static requestTimeout = 15_000;
+  private socket?: WebSocket; private nextId = 1; private pending = new Map<number, { resolve: (value: unknown) => void; reject: (reason: Error) => void; timeout: number }>();
   private reconnectTimer?: number; private heartbeatTimer?: number; private retries = 0; private deliberate = false; private subscribed = false;
   private stateListeners = new Set<StateListener>(); private statusListeners = new Set<StatusListener>();
   constructor(private config: HassConfig) {}
@@ -37,8 +37,22 @@ export class HomeAssistantClient {
     if (message.type === 'result') { const request = this.pending.get(message.id); if (!request) return; this.pending.delete(message.id); message.success ? request.resolve(message.result) : request.reject(new Error(message.error?.message ?? 'Home Assistant a refusé la commande.')); }
   }
   private send(payload: Record<string, unknown>) { if (this.socket?.readyState !== WebSocket.OPEN) throw new Error('Connexion indisponible'); this.socket.send(JSON.stringify(payload)); }
-  request<T>(payload: Record<string, unknown>): Promise<T> { const id = this.nextId++; return new Promise<T>((resolve, reject) => { this.pending.set(id, { resolve: value => resolve(value as T), reject }); try { this.send({ id, ...payload }); } catch (error) { this.pending.delete(id); reject(error); } }); }
+  request<T>(payload: Record<string, unknown>): Promise<T> {
+    const id = this.nextId++;
+    return new Promise<T>((resolve, reject) => {
+      const timeout = globalThis.setTimeout(() => { this.pending.delete(id); reject(new Error('Home Assistant n’a pas confirmé la commande. Vérifiez son état avant de réessayer.')); }, HomeAssistantClient.requestTimeout);
+      this.pending.set(id, {
+        timeout,
+        resolve: value => { globalThis.clearTimeout(timeout); resolve(value as T); },
+        reject: reason => { globalThis.clearTimeout(timeout); reject(reason); }
+      });
+      try { this.send({ id, ...payload }); } catch (error) { globalThis.clearTimeout(timeout); this.pending.delete(id); reject(error); }
+    });
+  }
   async getStates() { return this.request<HassEntity[]>({ type: 'get_states' }); }
+  async getHistory(entityIds: string[], start: Date, end: Date) {
+    return this.request<unknown>({ type: 'history/history_during_period', entity_ids: entityIds, start_time: start.toISOString(), end_time: end.toISOString(), include_start_time_state: true, significant_changes_only: false, minimal_response: true, no_attributes: true });
+  }
   async getRegistries(): Promise<HassRegistries> { const [entities, devices, areas] = await Promise.all([this.request<Array<Record<string, unknown>>>({ type: 'config/entity_registry/list' }), this.request<Array<Record<string, unknown>>>({ type: 'config/device_registry/list' }), this.request<Array<Record<string, unknown>>>({ type: 'config/area_registry/list' })]); return { entities, devices, areas }; }
   async subscribeStates() { if (this.subscribed) return; await this.request({ type: 'subscribe_events', event_type: 'state_changed' }); this.subscribed = true; }
   callService(domain: string, service: string, serviceData: Record<string, unknown>, target?: { entity_id: string | string[] }) { return this.request<HassEntity[]>({ type: 'call_service', domain, service, service_data: serviceData, target }); }

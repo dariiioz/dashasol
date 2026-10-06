@@ -4,3 +4,14 @@ describe('configuration migration', () => { it('upgrades an incomplete persisted
   it('promotes legacy per-category names to shared entity labels', () => { const migrated = migrateConfig({ dashboard: { coverEntities: [{ entityId: 'cover.volet_baie', enabled: true, order: 0, customName: 'Baie vitrée' }] }, labels: { 'sensor.therm_sdb': 'Salle de bain', 'sensor.vide': '  ' } }); expect(migrated.labels['cover.volet_baie']).toBe('Baie vitrée'); expect(migrated.labels['sensor.therm_sdb']).toBe('Salle de bain'); expect(migrated.labels['sensor.vide']).toBeUndefined(); });
   it('completes a partial preferences object with the defaults', () => { const migrated = migrateConfig({ preferences: { theme: 'light' } }); expect(migrated.preferences.theme).toBe('light'); expect(migrated.preferences.showUnavailable).toBe(true); expect(migrated.preferences.startupPage).toBe('home'); });
   it('gives a configuration written before the assistant a usable model', () => { const fresh = migrateConfig({ configured: true }); expect(fresh.assistant.model).toBe(defaultAssistantModel); expect(fresh.assistant.apiKey).toBeUndefined(); expect(fresh.assistant.voice).toBe(true); const chosen = migrateConfig({ assistant: { apiKey: 'sk-or-v1-abc', model: '  deepseek/deepseek-r1  ', voice: false } }); expect(chosen.assistant).toEqual({ apiKey: 'sk-or-v1-abc', model: 'deepseek/deepseek-r1', voice: false }); }); });
+
+it('preserves disabled equipment, display order and quick commands across migration', () => {
+  const migrated = migrateConfig({ dashboard: {
+    coverEntities: [{ entityId: 'cover.b', enabled: false, order: 5, roomName: 'Bureau' }, { entityId: 'cover.a', enabled: true, order: 2 }],
+    automationLower: { entityId: 'automation.bas', enabled: false, order: 0 },
+    automationUpper: { entityId: 'script.haut', enabled: true, order: 1 }
+  } });
+  expect(migrated.dashboard.coverEntities).toEqual([{ entityId: 'cover.b', enabled: false, order: 5, roomName: 'Bureau' }, { entityId: 'cover.a', enabled: true, order: 2 }]);
+  expect(migrated.dashboard.automationLower).toEqual({ entityId: 'automation.bas', enabled: false, order: 0 });
+  expect(migrated.dashboard.automationUpper?.entityId).toBe('script.haut');
+});

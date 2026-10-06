@@ -15,7 +15,7 @@ export class OpenRouterClient {
     if (!apiKey) throw new OpenRouterError(401, 'Aucune clé OpenRouter enregistrée.');
     let response: Response;
     /** A wall tablet loses its network regularly: a dropped fetch must read like every other OpenRouter failure. */
-    try { response = await fetch(ENDPOINT, { method: 'POST', signal, headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json', 'X-Title': 'Sillage' }, body: JSON.stringify({ model, messages, temperature: 0.2, ...(tools.length ? { tools, tool_choice: 'auto' } : {}) }) }); }
+    try { response = await fetch(ENDPOINT, { method: 'POST', signal, headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json', 'X-Title': 'Domoryx' }, body: JSON.stringify({ model, messages, temperature: 0.2, ...(tools.length ? { tools, tool_choice: 'auto' } : {}) }) }); }
     catch (failure) { throw failure instanceof DOMException && failure.name === 'AbortError' ? failure : new OpenRouterError(0, message(0)); }
     const payload = await response.json().catch(() => undefined) as { error?: { message?: string }; choices?: { message?: { content?: string | null; tool_calls?: ToolCall[] } }[] } | undefined;
     if (!response.ok) throw new OpenRouterError(response.status, message(response.status, payload?.error?.message));

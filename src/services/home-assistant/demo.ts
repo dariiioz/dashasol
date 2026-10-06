@@ -1,5 +1,6 @@
 import type { HassEntity } from '../../types/homeAssistant';
 export const demoEntities: HassEntity[] = [
+  { entity_id: 'sensor.maison_puissance', state: '1240', attributes: { friendly_name: 'Puissance de la maison', unit_of_measurement: 'W', device_class: 'power', state_class: 'measurement' }, last_changed: '', last_updated: '' },
   { entity_id: 'weather.maison', state: 'partlycloudy', attributes: { friendly_name: 'Météo de la maison', temperature: 21, temperature_unit: '°C', humidity: 64, wind_speed: 14, wind_bearing: 230, forecast: [{ templow: 14, temperature: 24 }] }, last_changed: new Date().toISOString(), last_updated: new Date().toISOString() },
   { entity_id: 'sensor.terrasse_temperature', state: '21.4', attributes: { friendly_name: 'Température extérieure', unit_of_measurement: '°C', device_class: 'temperature' }, last_changed: '', last_updated: '' },
   { entity_id: 'sensor.terrasse_humidity', state: '64', attributes: { friendly_name: 'Humidité extérieure', unit_of_measurement: '%', device_class: 'humidity' }, last_changed: '', last_updated: '' },
@@ -17,4 +18,9 @@ export const demoEntities: HassEntity[] = [
   { entity_id: 'automation.ouvrir_les_volets_du_bas', state: 'on', attributes: { friendly_name: 'Ouverture des volets du bas' }, last_changed: '', last_updated: '' },
   { entity_id: 'automation.ouvrir_les_volets_du_haut', state: 'on', attributes: { friendly_name: 'Ouverture des volets du haut' }, last_changed: '', last_updated: '' }
 ];
-export const defaultMapping = { weather: 'weather.maison', outdoorTemperature: 'sensor.terrasse_temperature', outdoorHumidity: 'sensor.terrasse_humidity', uv: 'sensor.uv', sun: 'sun.sun', tempoToday: 'sensor.tempo_aujourdhui', tempoTomorrow: 'sensor.tempo_demain', temperatures: ['sensor.salon_temperature', 'sensor.cuisine_temperature', 'sensor.chambre_temperature', 'sensor.bureau_temperature'], climates: ['climate.salon', 'climate.chambre'], covers: ['cover.volet_salon', 'cover.volet_cuisine', 'cover.volet_chambre'], mediaPlayers: ['media_player.salon'] };
+export const defaultMapping = { power: 'sensor.maison_puissance', weather: 'weather.maison', outdoorTemperature: 'sensor.terrasse_temperature', outdoorHumidity: 'sensor.terrasse_humidity', uv: 'sensor.uv', sun: 'sun.sun', tempoToday: 'sensor.tempo_aujourdhui', tempoTomorrow: 'sensor.tempo_demain', temperatures: ['sensor.salon_temperature', 'sensor.cuisine_temperature', 'sensor.chambre_temperature', 'sensor.bureau_temperature'], climates: ['climate.salon', 'climate.chambre'], covers: ['cover.volet_salon', 'cover.volet_cuisine', 'cover.volet_chambre'], mediaPlayers: ['media_player.salon'] };
+
+export const demoAutomationTargets: Record<string, string[]> = {
+  'automation.ouvrir_les_volets_du_bas': ['cover.volet_salon', 'cover.volet_cuisine'],
+  'automation.ouvrir_les_volets_du_haut': ['cover.volet_chambre']
+};

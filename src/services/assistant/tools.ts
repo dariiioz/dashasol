@@ -22,7 +22,7 @@ export function planCall(name: string, args: Record<string, unknown>, allowed: I
   const entityId = text(args.entity_id); const permitted = new Set(allowed);
   if (!entityId) return { error: 'Paramètre entity_id manquant.' };
   /** The model only ever sees the household's own selection: an id from outside it is a hallucination, not a shortcut. */
-  if (!permitted.has(entityId)) return { error: `L’entité ${entityId} n’existe pas ou n’est pas pilotable depuis Sillage. Utilise un identifiant de la liste.` };
+  if (!permitted.has(entityId)) return { error: `L’entité ${entityId} n’existe pas ou n’est pas pilotable depuis Domoryx. Utilise un identifiant de la liste.` };
   const domain = domainOf(entityId);
   const wrongDomain = (expected: string) => ({ error: `${entityId} n’est pas un équipement de type ${expected}.` });
   if (name === 'set_temperature') {

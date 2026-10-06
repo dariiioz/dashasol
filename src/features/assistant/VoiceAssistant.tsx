@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Check, Mic, Send, Settings, Square, TriangleAlert, Volume2, VolumeX, X } from 'lucide-react';
 import { useAppStore } from '../../stores/appStore';
+import { useDialogFocus } from '../../hooks/useDialogFocus';
 import { useVoicePulse } from '../../hooks/useVoicePulse';
 import { assistantConfigured, useVoiceAssistant, type AssistantPhase } from '../../hooks/useVoiceAssistant';
 import { AssistantInstrument } from './AssistantInstrument';
@@ -22,6 +23,7 @@ function AssistantPanel({ configured, onClose }: { configured: boolean; onClose:
   const { phase, heard, answer, actions, error, ask, start, stop, cancel, forget, demo, canListen, blocked } = useVoiceAssistant();
   const setPage = useAppStore(s => s.setPage); const voice = useAppStore(s => s.assistant.voice) !== false; const setAssistant = useAppStore(s => s.setAssistant); const reducedMotion = useAppStore(s => s.preferences.reducedMotion);
   const [typed, setTyped] = useState(''); const [seconds, setSeconds] = useState(0); const busy = phase === 'thinking';
+  const dialog = useDialogFocus();
   const stage = useVoicePulse(phase === 'listening', heard);
   /** Closing must silence the microphone and the voice: a wall tablet left listening is exactly what nobody wants. */
   const close = () => { cancel(); onClose(); };
@@ -29,9 +31,9 @@ function AssistantPanel({ configured, onClose }: { configured: boolean; onClose:
   useEffect(() => { if (phase !== 'listening') { setSeconds(0); return; } const started = Date.now(); const tick = window.setInterval(() => setSeconds(Math.floor((Date.now() - started) / 1000)), 500); return () => window.clearInterval(tick); }, [phase]);
   const tap = () => phase === 'listening' ? stop() : phase === 'idle' ? start() : cancel();
   const submit = (event: React.FormEvent) => { event.preventDefault(); const question = typed.trim(); if (!question || busy) return; setTyped(''); void ask(question); };
-  return <div className="modal-backdrop hud-backdrop" role="presentation" onMouseDown={close}><motion.section className="assistant-modal" role="dialog" aria-modal="true" aria-label="Assistant vocal" initial={{ opacity: 0, scale: .96, y: 16 }} animate={{ opacity: 1, scale: 1, y: 0 }} transition={{ duration: .34, ease: [.16, 1, .3, 1] }} onMouseDown={event => event.stopPropagation()}>
+  return <div className="modal-backdrop hud-backdrop" role="presentation" onMouseDown={close}><motion.section ref={dialog} tabIndex={-1} className="assistant-modal" role="dialog" aria-modal="true" aria-label="Assistant vocal" initial={{ opacity: 0, scale: .96, y: 16 }} animate={{ opacity: 1, scale: 1, y: 0 }} transition={{ duration: .34, ease: [.16, 1, .3, 1] }} onMouseDown={event => event.stopPropagation()}>
     <button className="modal-close" onClick={close} aria-label="Fermer"><X /></button>
-    <header className="hud-header"><p className="eyebrow">Sillage · Assistant</p><h2>Parlez à la maison</h2></header>
+    <header className="hud-header"><p className="eyebrow">Domoryx · Assistant</p><h2>Parlez à la maison</h2></header>
     {!configured ? <div className="assistant-invitation"><p>Aucune clé OpenRouter n’est enregistrée sur cet appareil. L’assistant a besoin d’un modèle pour comprendre vos demandes.</p><button className="primary" onClick={() => { onClose(); setPage('settings'); }}><Settings size={16} /> Ouvrir les Réglages</button></div> : <>
       <div className={`hud-stage ${phase} ${reducedMotion ? 'still' : ''}`} ref={stage}>
         <motion.div className="hud-instrument" initial={{ opacity: 0, scale: .86 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: .55, delay: .08, ease: [.16, 1, .3, 1] }}>

@@ -3,7 +3,7 @@ import { codeChallenge, loopbackReady, redirectUri, spotifyScopes } from './auth
 describe('spotify authorization', () => {
   it('only accepts an origin Spotify will redirect back to', () => {
     expect(loopbackReady('http://127.0.0.1:5173')).toBe(true);
-    expect(loopbackReady('https://sillage.maison')).toBe(true);
+    expect(loopbackReady('https://domoryx.maison')).toBe(true);
     expect(loopbackReady('http://localhost:5173')).toBe(false);
     expect(loopbackReady('http://192.168.1.50:4173')).toBe(false);
   });

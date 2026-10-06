@@ -83,3 +83,57 @@
 @media (max-width:900px){.thermal-page{grid-template-columns:repeat(2,minmax(0,1fr))}.content{padding:30px 26px 100px}.app-shell{display:block}.rail{width:auto;height:73px;top:auto;right:0;bottom:0;inset-inline:0;flex-direction:row;padding:8px calc(10px + env(safe-area-inset-right)) calc(8px + env(safe-area-inset-bottom));border-right:0;border-top:1px solid var(--line)}.brand,.rail>.status{display:none}nav{margin:0;display:flex;justify-content:space-around;width:100%;gap:2px}nav button{width:auto;min-width:48px;min-height:49px}.hero{min-height:360px}.home-grid{grid-template-columns:1fr 1fr}.home-aside{display:none}.settings-layout{grid-template-columns:1fr 1fr}.onboarding{grid-template-columns:1fr}.onboarding-intro{padding:42px 35px}.onboarding-intro h1{margin:38px 0 15px}.onboarding-panel{margin:0;border-radius:30px 30px 0 0}.onboarding-intro .steps{display:none}}
 @media (max-width:620px){.assistant-modal{padding:26px 22px 28px}.hud-stage{--dial:clamp(180px,44vw,220px)}.assistant-answer{font-size:16px;padding:16px 17px}.thermal-page{grid-template-columns:minmax(0,1fr)}.hero{grid-template-columns:1fr;min-height:510px}.hero-weather{align-self:end}.home-grid,.settings-layout,.automation-settings{grid-template-columns:1fr}.tempo-section{min-height:180px}.page-heading{align-items:start;flex-direction:column}.cover-list{grid-template-columns:minmax(0,1fr)}.climate-control,.cover-control{grid-template-columns:1fr;gap:17px}.climate-current{position:absolute;right:25px}.temperature-scale,.cover-range{grid-column:auto}.now-playing{grid-template-columns:1fr}.album-art{min-height:220px}.cover-actions{grid-row:2}.shutter{grid-row:2;grid-column:1}.onboarding-panel{padding:34px 25px}.onboarding-intro h1{font-size:59px}.actions{flex-direction:column-reverse}.actions button{width:100%}}
 @media (prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+
+/* Wall controls: generous touch targets, quiet status and readable secondary text. */
+button:disabled,input:disabled{cursor:not-allowed;opacity:.45}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
+.global-actions button,.quick-actions button,.settings-buttons button{min-height:44px;padding-inline:16px;font-size:13px}
+.temperature-scale{grid-template-columns:48px 1fr 48px;gap:12px}
+.temperature-scale button{width:48px;height:48px;font-size:22px}
+.climate-top .icon-button{width:48px;height:48px;flex-basis:48px}
+.cover-actions button{width:48px!important;height:48px!important;min-width:48px!important;flex-basis:48px}
+input[type=range]{min-height:44px;touch-action:pan-y}
+.cover-range input[type=range]{touch-action:pan-x}
+.summary-numbers span{font-size:13px}.summary-numbers b{font-size:28px}
+.climate-top span,.cover-state,.track>span{font-size:14px}
+.connection-banner{display:flex;align-items:center;gap:16px;padding:14px 18px;margin-bottom:20px;border-radius:14px;background:color-mix(in srgb,var(--warm) 10%,var(--surface));border:1px solid color-mix(in srgb,var(--warm) 30%,transparent);font-size:14px;line-height:1.5}
+.connection-banner .status{flex-shrink:0}
+.settings-fold{margin-top:14px;border-radius:18px;background:var(--surface);border:1px solid var(--line)}
+.settings-fold summary{min-height:60px;padding:18px 24px;cursor:pointer;font-size:16px;font-weight:500}
+.settings-fold[open]>summary{border-bottom:1px solid var(--line)}
+.settings-fold>.entity-settings{margin-top:0;background:transparent}
+.cover-pagination button{width:44px;height:44px;border-radius:50%;background:radial-gradient(circle,var(--muted) 0 4px,transparent 5px)}
+.cover-pagination button.active{width:44px;border-radius:50%;background:radial-gradient(circle,var(--accent) 0 6px,transparent 7px)}
+.app-shell[data-reduced-motion=true] *,.app-shell[data-reduced-motion=true] *::before,.app-shell[data-reduced-motion=true] *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+@media(min-width:901px){.climate-control{min-height:320px}.climate-current b{font-size:54px}.now-playing{min-height:360px}}
+@media(max-width:620px){.climate-list{grid-template-columns:minmax(0,1fr)}.climate-current{position:static;right:auto}.connection-banner{align-items:flex-start;flex-direction:column;gap:8px}.settings-fold summary{padding:16px 20px}.summary-numbers{flex-wrap:wrap}.cover-control .shutter{width:110px}.cover-actions{gap:5px}}
+
+@media(max-width:620px){
+  .cover-control{grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto auto;gap:10px;padding:18px}
+  .cover-control>div:first-child{grid-column:1/-1}.cover-control .shutter{grid-row:2;grid-column:1}
+  .cover-control .cover-actions{grid-row:2;grid-column:2}.cover-control .cover-range{grid-row:3;grid-column:1/-1}
+}
+
+/* Instantaneous power shares the home utility column with maintenance. */
+.home-grid{grid-template-columns:1.4fr 1fr .9fr}.home-energy{display:grid;gap:12px;min-width:0}
+.power-card{border-radius:24px;padding:20px 22px;background:var(--surface);display:flex;flex-direction:column;justify-content:center;gap:5px}
+.power-card-title{display:flex;align-items:center;gap:8px}.power-card-title svg{color:var(--accent);flex-shrink:0}.power-card-title .eyebrow{font-size:10px;letter-spacing:.06em;margin:0;line-height:1.4}
+.power-card strong{font-size:clamp(28px,2.7vw,42px);letter-spacing:-.05em;font-weight:500;font-variant-numeric:tabular-nums;line-height:1.15;margin-top:7px}
+.power-card>span{font-size:13px}.power-card small{color:var(--muted);font-size:11px;line-height:1.4}.power-source{font-size:11px;color:var(--muted);margin:3px 0 0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.power-demo{font:10px 'DM Mono';color:var(--accent);margin-left:auto}.power-card button{min-height:44px;margin-top:6px;padding:10px 13px;background:var(--surface-2);border-radius:12px;font-size:13px}
+.home-energy .home-aside{display:flex;min-height:76px;padding:15px 20px;border-radius:20px;align-items:start;justify-content:center}.home-energy .home-aside svg{display:none}.home-energy .home-aside b{font-size:15px}.home-energy .home-aside span{font-size:12px;margin-top:3px}
+.power-settings{margin:20px 0;padding:20px;border:1px solid var(--line);border-radius:16px}.power-settings h3{font-size:17px;margin-top:0}.power-settings label{display:grid;gap:8px;font-size:13px}.power-settings select{max-width:100%;padding:12px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);color:var(--text)}.power-settings p{color:var(--muted);font-size:12px;line-height:1.5;margin:12px 0 0}
+/* Sensor curves retain their measured steps and leave recording gaps visible. */
+.history-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}.history-periods{display:flex;gap:6px;padding:4px;background:var(--surface);border-radius:16px}.history-periods button{min-width:64px;min-height:44px;padding:10px 14px;background:transparent;border-radius:12px;font-size:13px;color:var(--muted)}.history-periods button.selected{background:var(--accent);color:var(--bg)}.history-refresh{display:flex;align-items:center;gap:8px;min-height:44px;padding:10px 14px;background:var(--surface-2);border-radius:12px;font-size:13px}.history-note{font-size:11px;color:var(--muted);margin:0 0 16px;line-height:1.4}.history-error{padding:16px;border:1px solid var(--line);border-radius:14px;margin-bottom:16px;background:var(--surface)}.history-error p{margin-bottom:6px}.history-error span{font-size:12px;color:var(--muted)}
+.temperatures-page .thermal-page{grid-template-rows:repeat(2,minmax(240px,1fr))}.temperatures-page .thermal-card{gap:8px;min-height:240px;padding:18px 20px;justify-content:space-between}.thermal-now{display:flex;align-items:baseline;gap:10px}.thermal-now strong{font-size:clamp(32px,3.3vw,46px)}.thermal-now span{font-size:11px;color:var(--muted)}
+.temperature-history{margin:0;width:100%;min-width:0}.temperature-history svg{width:100%;height:82px;display:block;overflow:visible}.history-gridline{stroke:var(--line);stroke-width:1;stroke-dasharray:3 5}.history-line{fill:none;stroke:var(--accent);stroke-width:2;stroke-linejoin:round;stroke-linecap:round}.history-axis{display:flex;justify-content:space-between;margin-top:5px;color:var(--muted);font:9px 'DM Mono'}.temperature-history figcaption{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:10px;gap:8px}.temperature-history figcaption b{font-weight:500;color:var(--text);margin-left:3px}.history-empty{min-height:110px;display:flex;align-items:center;font-size:12px;line-height:1.5;color:var(--muted)}
+.temperatures-page .pagination button{width:44px;height:44px;border-radius:50%;background:radial-gradient(circle,var(--muted) 0 4px,transparent 5px)}.temperatures-page .pagination button.active{width:44px;border-radius:50%;background:radial-gradient(circle,var(--accent) 0 6px,transparent 7px)}
+@media(max-width:1100px) and (min-width:901px){.temperatures-page .thermal-page{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:900px){.home-grid{grid-template-columns:1fr 1fr}.home-energy{grid-column:1/-1;grid-template-columns:1fr 1fr}.power-card{min-height:175px}.home-energy .home-aside{min-height:175px}}
+@media(max-width:620px){.home-grid{grid-template-columns:1fr}.home-energy{grid-template-columns:1fr}.home-energy .home-aside{min-height:76px}.power-card{min-height:170px}.history-toolbar{align-items:stretch;gap:8px}.history-periods button{min-width:52px;padding-inline:9px}.history-refresh{font-size:0;padding:12px}.history-refresh svg{width:19px;height:19px}.thermal-now strong{font-size:40px}}
+
+.brand-word{margin-top:12px;font:500 10px 'DM Mono';letter-spacing:.06em;color:var(--accent)}
+.power-card-trigger{width:100%;text-align:left;border:1px solid transparent;transition:border-color .2s,background .2s}.power-card-trigger:hover{border-color:var(--accent);background:var(--surface-2)}.power-card .power-history-link{margin-top:10px;color:var(--accent);font-size:11px}
+.power-history-modal{position:relative;width:min(760px,100%);max-height:90dvh;overflow:auto;padding:34px;border-radius:26px;background:var(--surface);box-shadow:0 28px 80px rgba(0,0,0,.45)}.power-history-modal .eyebrow{display:flex;align-items:center;gap:8px}.power-history-modal h2{margin-right:40px}.power-history-source{color:var(--muted);font-size:13px;overflow-wrap:anywhere}.power-history-current{display:flex;align-items:baseline;gap:12px;margin:24px 0 14px}.power-history-current strong{font-size:44px;font-weight:500;letter-spacing:-.04em;font-variant-numeric:tabular-nums}.power-history-current span{font-size:12px;color:var(--muted)}.power-history-modal .temperature-history svg{height:200px}.power-history-modal .history-axis{font-size:11px}.power-history-modal figcaption{font-size:13px}.power-history-footer{display:flex;justify-content:space-between;align-items:center;gap:12px;border-top:1px solid var(--line);margin-top:24px;padding-top:16px}.power-history-footer>span{font-size:11px;color:var(--muted)}
+@media(max-width:620px){.power-history-modal{padding:28px 20px}.power-history-modal h2{font-size:25px}.power-history-modal .temperature-history svg{height:150px}.power-history-current strong{font-size:36px}.power-history-footer .history-refresh{font-size:12px}}
+@media(max-width:900px){.brand-word{display:none}}
