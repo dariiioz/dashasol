@@ -4,16 +4,22 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "node scripts/dev.mjs",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "vehicle:setup": "node scripts/setup-vehicle.mjs",
+    "vehicle:serve": ".venv-vehicle/bin/python server/vehicle/app.py",
+    "vehicle:test": ".venv-vehicle/bin/python -m unittest discover -s server/vehicle -p \"test_*.py\"",
+    "eufy:serve": "node server/eufy/server.mjs",
+    "eufy:test": "node --test server/eufy/server.check.mjs"
   },
   "dependencies": {
     "@fontsource/dm-mono": "^5.3.0",
     "@fontsource/dm-sans": "^5.3.0",
     "@fontsource/playfair-display": "^5.3.0",
+    "@mega-yfue/eufy-sdk": "^0.4.0",
     "framer-motion": "^12.23.12",
     "lucide-react": "^0.468.0",
     "react": "^19.0.0",

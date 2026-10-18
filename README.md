@@ -90,6 +90,22 @@ La page **Températures** affiche les courbes des capteurs sélectionnés sur **
 
 Le mode démo fournit une puissance variable et des courbes simulées, identifiées comme telles.
 
+## Météo locale
+
+L’accueil et l’onglet **Météo** utilisent Open-Meteo directement, sans clé API et sans dépendre de Home Assistant. La localisation est centrée sur Marquise (62250), sans adresse personnelle enregistrée. Le client se trouve dans `src/services/weather`, le partage des requêtes et le rafraîchissement dans `src/hooks/useWeather.ts`.
+
+L’onglet propose les conditions actuelles issues des modèles, le ressenti, les prévisions sur dix jours (les jours lointains sont indiqués comme tendances), une courbe horaire température/pluie/vent et le détail de chaque journée. Sont également affichés le vent et les rafales, l’humidité, la pression, la visibilité, les UV, les horaires du soleil, la qualité de l’air européenne et les pollens disponibles via CAMS. Les données absentes restent signalées par un tiret. Le lien Vigilance ouvre la page officielle du Pas-de-Calais.
+
+L’onglet est paginé horizontalement comme les températures : conditions actuelles, prévisions et air. Sur un écran étroit ou de moins de 650 px de haut, les détails et les heures occupent des pages séparées. Les cartes utilisent la hauteur disponible entre la navigation et les marges ; le balayage et les boutons restent accessibles, y compris après un changement d’orientation.
+
+Les données restent en mémoire et se rafraîchissent toutes les quinze minutes pendant la consultation, au retour sur l’application et à la reconnexion réseau. Une panne conserve les dernières valeurs et les signale comme anciennes. Les heures utilisent explicitement Europe/Paris, y compris lors des changements d’heure. Le mode démo conserve sa météo simulée sur l’accueil et ne contacte pas les API. Sources : [Open-Meteo](https://open-meteo.com/en/docs) et [CAMS via Open-Meteo](https://open-meteo.com/en/docs/air-quality-api).
+
+## Volkswagen ID.4
+
+L’onglet **ID.4** utilise une connexion Volkswagen dédiée, en lecture seule : batterie, autonomie, recharge, prise et kilométrage selon les données accessibles sur le portail. Il nécessite le service Python local optionnel ; aucun mot de passe n’est sauvegardé. Installation : `npm run vehicle:setup` (Python 3.10+), puis `npm run dev`. La connexion et le code reçu par e-mail se saisissent dans l’onglet. Le premier relevé réel reste à valider avec le compte du propriétaire.
+
+Les lectures Volkswagen sont espacées d’au moins cinq minutes. Les cartes distinguent l’horodatage du véhicule de la dernière consultation et tiennent dans la hauteur disponible. Voir [la documentation Volkswagen](docs/volkswagen.md) pour les sources GitHub vérifiées, les limitations et le déploiement du service ; un hébergement purement statique ne suffit pas pour cette fonction.
+
 ## Mode démo
 
 Le mode démo est intégré, ne contacte aucun service et fournit météo, Tempo, températures, thermostat, volets, Spotify et mises à jour simulés. Les contrôles modifient les données locales pour valider l’expérience sans instance Home Assistant.

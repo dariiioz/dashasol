@@ -17,4 +17,4 @@ export interface AssistantConfig { apiKey?: string; model?: string; voice?: bool
 export interface HassRegistries { entities: Array<Record<string, unknown>>; devices: Array<Record<string, unknown>>; areas: Array<Record<string, unknown>> }
 export interface RoomConfig { id: string; name: string; temperature?: string; humidity?: string; climate?: string; cover?: string; order: number; hidden?: boolean }
 export interface AppPreferences { theme: 'dark' | 'light' | 'auto'; hour12: boolean; reducedMotion: boolean; autoHomeSeconds: number; confirmGlobalActions: boolean; showUnavailable: boolean; startupPage: Page }
-export type Page = 'home' | 'temperatures' | 'heating' | 'covers' | 'media' | 'settings';
+export type Page = 'energy' | 'entry' | 'planner' | 'vehicle' | 'weather' | 'home' | 'temperatures' | 'heating' | 'covers' | 'media' | 'settings';

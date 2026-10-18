@@ -8,3 +8,10 @@ dev-dist/
 .vite/
 .DS_Store
 Thumbs.db
+
+.venv-vehicle/
+.vehicle-data/
+__pycache__/
+*.pyc
+
+.eufy-data/

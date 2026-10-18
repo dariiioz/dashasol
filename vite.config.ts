@@ -7,8 +7,8 @@ const { version } = JSON.parse(readFileSync(new URL('./package.json', import.met
 export default defineConfig({
   define: { 'import.meta.env.VITE_APP_VERSION': JSON.stringify(version) },
   // Listening on every interface serves three needs at once: localhost, the 127.0.0.1 loopback that Spotify demands for authorization, and the wall tablet on the local network.
-  server: { host: true, port: 5173, strictPort: true },
-  preview: { host: true, port: 4173, strictPort: true },
+  server: { host: true, port: 5173, strictPort: true, fs: { deny: ['.env', '.env.*', '*.{crt,pem}', '**/.git/**', '**/.vehicle-data/**', '**/.eufy-data/**', '**/.venv-vehicle/**'] }, proxy: { '/api/eufy': { target: 'http://127.0.0.1:8767', changeOrigin: false }, '/api/vehicle': { target: 'http://127.0.0.1:8766', changeOrigin: false } } },
+  preview: { host: true, port: 4173, strictPort: true, proxy: { '/api/eufy': { target: 'http://127.0.0.1:8767', changeOrigin: false }, '/api/vehicle': { target: 'http://127.0.0.1:8766', changeOrigin: false } } },
   plugins: [react(), VitePWA({ registerType: 'prompt', includeAssets: ['favicon.ico', 'apple-touch-icon-180x180.png', 'icon.svg'], manifest: {
     name: 'Domoryx — Maison connectée', short_name: 'Domoryx', description: 'Le tableau de bord sensible de votre maison.',
     theme_color: '#101315', background_color: '#101315', display: 'standalone', orientation: 'landscape', start_url: '/', icons: [
