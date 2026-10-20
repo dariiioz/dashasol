@@ -1,7 +1,7 @@
 import type { HomeLayout, HomeModule, Page, WallSettings } from '../types/homeAssistant';
 export const homeModules: HomeModule[] = ['tempo', 'spotify', 'vehicle', 'people', 'shopping', 'calendar'];
 export const moduleNames: Record<HomeModule, string> = { tempo: 'Tempo', spotify: 'Spotify', vehicle: 'ID.4', people: 'Personnes', shopping: 'Courses', calendar: 'Calendrier' };
-export const defaultWall: WallSettings = { keepAwake: false, nightMode: false, nightStart: '22:00', nightEnd: '07:00' };
+export const defaultWall: WallSettings = { keepAwake: false, nightMode: false, nightStart: '22:00', nightEnd: '07:00', screensaverSeconds: 120 };
 export function homeLayout(value?: Partial<HomeLayout>): HomeLayout {
   return { order: [...[...new Set([...(Array.isArray(value?.order) ? value.order.filter(key => homeModules.includes(key)) : []), ...homeModules])].filter(key => key !== 'calendar'), 'calendar'], visibility: Object.fromEntries(Object.entries(value?.visibility ?? {}).filter(([key, mode]) => homeModules.includes(key as HomeModule) && ['auto', 'show', 'hide'].includes(mode))), density: value?.density === 'compact' ? 'compact' : 'comfortable' };
 }

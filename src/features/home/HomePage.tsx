@@ -1,3 +1,4 @@
+import { TimerButton } from '../../components/Timer';
 import { configuredClientId } from '../../services/spotify/auth';
 import { homeLayout } from '../../utils/preferences';
 import { useVehicle } from '../../hooks/useVehicle';
@@ -59,7 +60,7 @@ export function HomePage() {
       <div className="hero-time"><p>{frDate.format(now)}</p><time>{clock}</time></div>
       <button className="hero-weather" aria-label="Ouvrir la météo" onClick={() => setPage('weather')}><div className="weather-headline"><WeatherIcon size={28} strokeWidth={1.5} /><strong>{temperature(numberState(outdoor) ?? (Number.isFinite(weatherTemperature) ? weatherTemperature : undefined), degreeUnit(outdoor ?? weather))}</strong></div><span>{weatherLabel(condition)}</span>{!demo && (meteo.error || (live && now.getTime() - live.fetchedAt > 30 * 60_000)) && <small className="home-weather-error">{live ? 'Dernières prévisions conservées' : 'Météo indisponible'}</small>}</button>
       <div className="home-voice"><VoiceAssistant compact /></div>
-    </section><section className="home-side">{layout.order.filter(key => key !== 'calendar' && visible(key) && cards[key]).map(key => <div className="home-module" data-module={key} key={key}>{cards[key]}</div>)}<HomeServiceShortcuts spotify={visible('spotify') && !showSpotify} vehicle={visible('vehicle') && !showVehicle} /><HomeQuickActions><button className="home-update-button" aria-label={updates.length ? `${updates.length} mise${updates.length > 1 ? 's' : ''} à jour` : 'À jour'} title={updates.length ? `${updates.length} mises à jour` : 'À jour'} onClick={() => setUpdatesOpen(true)} disabled={!updates.length}><Download size={18} />{updates.length > 0 && <small>{updates.length}</small>}</button><HomeCustomization /></HomeQuickActions></section>{visible('calendar') && calendar}</>;
+    </section><section className="home-side">{layout.order.filter(key => key !== 'calendar' && visible(key) && cards[key]).map(key => <div className="home-module" data-module={key} key={key}>{cards[key]}</div>)}<HomeServiceShortcuts spotify={visible('spotify') && !showSpotify} vehicle={visible('vehicle') && !showVehicle} /><TimerButton /><HomeQuickActions><button className="home-update-button" aria-label={updates.length ? `${updates.length} mise${updates.length > 1 ? 's' : ''} à jour` : 'À jour'} title={updates.length ? `${updates.length} mises à jour` : 'À jour'} onClick={() => setUpdatesOpen(true)} disabled={!updates.length}><Download size={18} />{updates.length > 0 && <small>{updates.length}</small>}</button><HomeCustomization /></HomeQuickActions></section>{visible('calendar') && calendar}</>;
     }} />
     {updatesOpen && <UpdateModal updates={updates} name={name} onClose={() => setUpdatesOpen(false)} />}
   </motion.div>;

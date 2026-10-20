@@ -19,6 +19,6 @@ export interface HassRegistries { entities: Array<Record<string, unknown>>; devi
 export interface RoomConfig { id: string; name: string; temperature?: string; humidity?: string; climate?: string; cover?: string; order: number; hidden?: boolean }
 export type HomeModule = 'tempo' | 'spotify' | 'vehicle' | 'people' | 'shopping' | 'calendar';
 export interface HomeLayout { order: HomeModule[]; visibility: Partial<Record<HomeModule, 'auto' | 'show' | 'hide'>>; density: 'comfortable' | 'compact' }
-export interface WallSettings { keepAwake: boolean; nightMode: boolean; nightStart: string; nightEnd: string }
+export interface WallSettings { keepAwake: boolean; nightMode: boolean; nightStart: string; nightEnd: string; screensaverSeconds?: number }
 export interface AppPreferences { theme: 'dark' | 'light' | 'auto'; hour12: boolean; reducedMotion: boolean; autoHomeSeconds: number; confirmGlobalActions: boolean; showUnavailable: boolean; startupPage: Page; home?: HomeLayout; wall?: WallSettings; navigationFavorites?: Page[] }
 export type Page = 'energy' | 'entry' | 'planner' | 'vehicle' | 'weather' | 'home' | 'temperatures' | 'heating' | 'covers' | 'media' | 'settings';
