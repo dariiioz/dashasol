@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import type { HassEntity } from '../../types/homeAssistant';
 const { callService } = vi.hoisted(() => ({ callService: vi.fn().mockResolvedValue([]) }));
-vi.mock('../../hooks/useHomeAssistant', () => ({ getHomeAssistantClient: () => ({ callService }), useHomeAssistant: () => undefined }));
+vi.mock('../../hooks/useHomeAssistant', () => ({ getHomeAssistantClient: () => ({ callService }), callHomeAssistantService: callService, useHomeAssistant: () => undefined }));
 const { useAppStore } = await import('../../stores/appStore');
 const { VoiceAssistant } = await import('./VoiceAssistant');
 const entity = (entity_id: string, state: string, attributes: Record<string, unknown> = {}): HassEntity => ({ entity_id, state, attributes, last_changed: '', last_updated: '' });

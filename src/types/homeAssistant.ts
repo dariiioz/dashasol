@@ -7,7 +7,8 @@ export interface EntityMapping { power?: string; weather?: string; outdoorTemper
 export interface EntitySelection { entityId: string; roomName?: string; areaId?: string; icon?: string; enabled: boolean; order: number }
 /** Personal display names, one per entity id, shared by every page of the interface. */
 export type EntityLabels = Record<string, string>;
-export interface DashboardEntityConfig { temperatureEntities: EntitySelection[]; climateEntities: EntitySelection[]; coverEntities: EntitySelection[]; mediaEntities: EntitySelection[]; updateEntities: EntitySelection[]; automationLower?: EntitySelection; automationUpper?: EntitySelection }
+export type CoverCommandKey = 'allClose' | 'allOpen' | 'upperOpen' | 'upperClose' | 'lowerOpen' | 'lowerClose';
+export interface DashboardEntityConfig { temperatureEntities: EntitySelection[]; climateEntities: EntitySelection[]; coverEntities: EntitySelection[]; mediaEntities: EntitySelection[]; updateEntities: EntitySelection[]; automationLower?: EntitySelection; automationUpper?: EntitySelection; people?: Record<string, string>; coverCommands?: Partial<Record<CoverCommandKey, string>> }
 /** Spotify is reached straight from the browser: the Client ID is public and only a rotating refresh token is kept. */
 export interface SpotifyConfig { clientId?: string; refreshToken?: string; pinned?: PinnedPlaylist[] }
 /** Playlists the household pinned to the shelf, kept locally so they survive a Spotify library reshuffle. */
@@ -16,5 +17,8 @@ export interface PinnedPlaylist { uri: string; name: string; cover?: string; tra
 export interface AssistantConfig { apiKey?: string; model?: string; voice?: boolean }
 export interface HassRegistries { entities: Array<Record<string, unknown>>; devices: Array<Record<string, unknown>>; areas: Array<Record<string, unknown>> }
 export interface RoomConfig { id: string; name: string; temperature?: string; humidity?: string; climate?: string; cover?: string; order: number; hidden?: boolean }
-export interface AppPreferences { theme: 'dark' | 'light' | 'auto'; hour12: boolean; reducedMotion: boolean; autoHomeSeconds: number; confirmGlobalActions: boolean; showUnavailable: boolean; startupPage: Page }
+export type HomeModule = 'tempo' | 'spotify' | 'vehicle' | 'people' | 'shopping' | 'calendar';
+export interface HomeLayout { order: HomeModule[]; visibility: Partial<Record<HomeModule, 'auto' | 'show' | 'hide'>>; density: 'comfortable' | 'compact' }
+export interface WallSettings { keepAwake: boolean; nightMode: boolean; nightStart: string; nightEnd: string }
+export interface AppPreferences { theme: 'dark' | 'light' | 'auto'; hour12: boolean; reducedMotion: boolean; autoHomeSeconds: number; confirmGlobalActions: boolean; showUnavailable: boolean; startupPage: Page; home?: HomeLayout; wall?: WallSettings; navigationFavorites?: Page[] }
 export type Page = 'energy' | 'entry' | 'planner' | 'vehicle' | 'weather' | 'home' | 'temperatures' | 'heating' | 'covers' | 'media' | 'settings';

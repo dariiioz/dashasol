@@ -1,3 +1,4 @@
+import os
 import unittest
 from charger import normalize
 
@@ -52,7 +53,10 @@ class ChargeArchiveTest(unittest.TestCase):
             self.assertAlmostEqual(sum(s['kwh'] for s in session['segments']), session['energyKwh'])
             self.assertIsNone(archive.public()['active'])
             self.assertEqual(ChargeArchive(path).public()['sessions'], [session])
-            self.assertEqual(path.stat().st_mode & 0o777, 0o600)
+            if os.name != 'nt':
+                self.assertEqual(path.stat().st_mode & 0o777, 0o600)
+            else:
+                self.assertTrue(os.access(path, os.R_OK | os.W_OK))
 
     def test_first_observation_mid_charge_is_partial_and_duplicate_does_not_add_energy(self):
         with tempfile.TemporaryDirectory() as directory:

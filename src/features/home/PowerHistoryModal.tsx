@@ -10,7 +10,6 @@ import { TemperatureChart } from '../temperatures/TemperatureChart';
 export function PowerHistoryModal({ entityId, onClose }: { entityId: string; onClose: () => void }) {
   const dialog = useDialogFocus();
   const entity = useAppStore(s => s.entities[entityId]);
-  const demo = useAppStore(s => s.demo);
   const name = useEntityName();
   const history = useTemperatureHistory([entityId], 24, 'power');
   const unit = String(entity?.attributes.unit_of_measurement ?? '');
@@ -29,10 +28,10 @@ export function PowerHistoryModal({ entityId, onClose }: { entityId: string; onC
       <h2>Les 24 dernières heures</h2>
       <p className="power-history-source">{name(entity ?? entityId)}</p>
       <div className="power-history-current"><strong>{watts === undefined ? '—' : formatPower(watts)}</strong><span>maintenant</span></div>
-      <p className="history-note">{demo ? 'Courbe simulée · mode démonstration' : 'Puissance instantanée enregistrée par Home Assistant'}</p>
+
       {history.status === 'error' ? <div className="history-error" role="status"><p>{history.error}</p><span>Vérifiez que ce capteur est enregistré dans l’historique Home Assistant.</span></div>
         : <TemperatureChart points={points} start={history.start} end={history.end} unit="W" name={name(entity ?? entityId)} loading={history.status === 'loading'} formatValue={formatPower} />}
-      <div className="power-history-footer"><span>Actualisation toutes les 5 min</span><button className="history-refresh" disabled={history.status === 'loading'} onClick={history.reload}><RefreshCw size={16} className={history.status === 'loading' ? 'spin' : ''} /> Actualiser</button></div>
+      <div className="power-history-footer"><button className="history-refresh" disabled={history.status === 'loading'} onClick={history.reload}><RefreshCw size={16} className={history.status === 'loading' ? 'spin' : ''} /> Actualiser</button></div>
     </section>
   </div>;
 }

@@ -18,6 +18,12 @@ it('reports a missing backend rather than treating a static fallback as vehicle 
  vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => { throw new Error('HTML'); } }));
  await expect(vehicleRequest('status')).rejects.toThrow('invalide');
 });
+it('distinguishes a missing local service from a responding bridge with an upstream problem', async () => {
+ vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false, status: 502, json: async () => { throw new Error('HTML proxy response'); } }));
+ await expect(vehicleRequest('status')).rejects.toMatchObject({ serviceUnavailable: true });
+ vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false, status: 503, json: async () => ({ error: 'Portail indisponible' }) }));
+ await expect(vehicleRequest('status')).rejects.toMatchObject({ serviceUnavailable: false });
+});
 
 it('propagates a consent wall so the UI leaves the completed OTP challenge', async () => {
  vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false, status: 409, json: async () => ({ phase: 'consent_required', error: 'Validez la demande sur myVolkswagen.' }) }));

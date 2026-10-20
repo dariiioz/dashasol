@@ -1,4 +1,9 @@
-import { useEffect, useRef, useState } from 'react';
+import { configuredClientId } from '../../services/spotify/auth';
+import { homeLayout } from '../../utils/preferences';
+import { useVehicle } from '../../hooks/useVehicle';
+import { HomeCustomization } from './HomeCustomization';
+import { HomeServiceShortcuts } from './HomeServiceShortcuts';
+import { useEffect, useState, type ReactNode } from 'react';
 import { motion } from 'framer-motion';
 import { useShallow } from 'zustand/react/shallow';
 import { Cloud, CloudFog, CloudHail, CloudLightning, CloudRain, CloudSnow, CloudSun, Moon, Sun, Wind, X, Download } from 'lucide-react';
@@ -9,11 +14,11 @@ import { weatherCondition } from '../../services/weather/client';
 import { useClock } from '../../hooks/useClock';
 import { useEntityName } from '../../hooks/useEntityName';
 import { WeatherScene } from '../weather/WeatherScene';
-import { EntryLink } from './EntryLink';
-import { HomePager } from './HomePager';
+import { HomeQuickActions } from './HomeQuickActions';
+import { HomeSpotifyCard } from './HomeSpotifyCard';
+import { HomePeopleCard } from './HomePeopleCard';
 import { PlannerCards } from './PlannerCards';
 import { VehicleCard } from './VehicleCard';
-import { PowerCard } from './PowerCard';
 import { VoiceAssistant } from '../assistant/VoiceAssistant';
 import { skyPhase } from '../weather/sky';
 import { useAppStore } from '../../stores/appStore';
@@ -28,7 +33,8 @@ const weatherIcons: Record<string, typeof Cloud> = { sunny: Sun, 'clear-night': 
 /** `sun.sun` exists on every Home Assistant install and is never asked during onboarding: fall back to it. */
 const sunEntity = (state: ReturnType<typeof useAppStore.getState>) => state.entities[state.mapping.sun || 'sun.sun'];
 export function HomePage() {
-  const viewport = useRef<HTMLDivElement>(null);
+  const preferences = useAppStore(s => s.preferences.home); const layout = homeLayout(preferences);
+  const spotify = useAppStore(s => s.spotify);
   const now = useClock(); const hour12 = useAppStore(s => s.preferences.hour12); const reducedMotion = useAppStore(s => s.preferences.reducedMotion); const demo = useAppStore(s => s.demo); const name = useEntityName();
   const haWeather = useAppStore(mapped('weather')); const haOutdoor = useAppStore(mapped('outdoorTemperature')); const sun = useAppStore(sunEntity); const today = useAppStore(s => tempoEntities(s.entities, s.mapping).today); const tomorrow = useAppStore(s => tempoEntities(s.entities, s.mapping).tomorrow);
   const meteo = useWeather(!demo); const live = !demo ? meteo.forecast : undefined; const current = live?.current;
@@ -39,7 +45,24 @@ export function HomePage() {
   const clock = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', hour12 });
   const weatherTemperature = Number(weather?.attributes.temperature); const windSpeed = Number(weather?.attributes.wind_speed);
   const condition = weather?.state; const phase = current ? current.day ? 'day' : 'night' : skyPhase(sun, now); const WeatherIcon = weatherIcons[condition ?? ''] ?? (phase === 'night' ? Moon : Sun);
-  return <motion.div ref={viewport} className="home-page page" initial={{ opacity: 0 }} animate={{ opacity: 1 }}><section className="hero" data-sky={phase} data-weather={condition}><WeatherScene condition={condition} phase={phase} windSpeed={Number.isFinite(windSpeed) ? windSpeed : undefined} reducedMotion={reducedMotion} /><div className="hero-time"><p>{frDate.format(now)}</p><time>{clock}</time><VoiceAssistant /></div><div className="hero-weather"><div className="weather-headline"><WeatherIcon size={34} strokeWidth={1.5} /><strong>{temperature(numberState(outdoor) ?? (Number.isFinite(weatherTemperature) ? weatherTemperature : undefined), degreeUnit(outdoor ?? weather))}</strong></div><span>{weatherLabel(condition)}</span>{!demo && <><button className="home-weather-link" onClick={() => setPage('weather')}>Marquise · Prévisions →</button>{(meteo.error || (live && now.getTime() - live.fetchedAt > 30 * 60_000)) && <small className="home-weather-error">{live ? 'Dernières prévisions conservées' : 'Météo indisponible'}</small>}</>}<EntryLink /></div></section><section className="home-grid"><div className="tempo-section" role="group" aria-label="Tempo" onClick={() => setPage('energy')}><button className="tempo-energy-link" aria-label="Voir l’énergie et Tempo" /><Tempo label="Aujourd’hui" entity={today} /><Tempo label="Demain" entity={tomorrow} /></div><VehicleCard /><div className="home-energy"><PowerCard compact /><button className="home-aside update-indicator" onClick={() => setUpdatesOpen(true)} disabled={!updates.length}><Download size={15} /><b>{updates.length ? `${updates.length} mise${updates.length > 1 ? 's' : ''} à jour` : 'À jour'}</b></button></div></section><PlannerCards /><HomePager viewport={viewport} reducedMotion={reducedMotion} />{updatesOpen && <UpdateModal updates={updates} name={name} onClose={() => setUpdatesOpen(false)} />}</motion.div>;
+  const vehicle = useVehicle(!demo && layout.visibility.vehicle !== 'hide');
+  const spotifyReady = demo || Boolean(configuredClientId(spotify.clientId) && spotify.refreshToken);
+  const vehicleReady = demo || vehicle.session.phase === 'connected';
+  const visible = (key: import('../../types/homeAssistant').HomeModule) => layout.visibility[key] !== 'hide';
+  const showSpotify = visible('spotify') && (spotifyReady || layout.visibility.spotify === 'show');
+  const showVehicle = visible('vehicle') && (vehicleReady || layout.visibility.vehicle === 'show');
+  return <motion.div className="home-page page home-layout" data-density={layout.density} data-calendar={visible('calendar')}  initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+    <PlannerCards render={({ shopping, calendar }) => {
+      const cards: Record<string, ReactNode> = { tempo: <div className="tempo-section" role="group" aria-label="Tempo" onClick={() => setPage('energy')}><button className="tempo-energy-link" aria-label="Voir l’énergie et Tempo" /><Tempo label="Aujourd’hui" entity={today} /><Tempo label="Demain" entity={tomorrow} /></div>, spotify: showSpotify ? <HomeSpotifyCard /> : null, vehicle: showVehicle ? <VehicleCard vehicle={vehicle} /> : null, people: <HomePeopleCard />, shopping };
+      return <><section className="hero" data-sky={phase} data-weather={condition}>
+      <WeatherScene condition={condition} phase={phase} windSpeed={Number.isFinite(windSpeed) ? windSpeed : undefined} reducedMotion={reducedMotion} />
+      <div className="hero-time"><p>{frDate.format(now)}</p><time>{clock}</time></div>
+      <button className="hero-weather" aria-label="Ouvrir la météo" onClick={() => setPage('weather')}><div className="weather-headline"><WeatherIcon size={28} strokeWidth={1.5} /><strong>{temperature(numberState(outdoor) ?? (Number.isFinite(weatherTemperature) ? weatherTemperature : undefined), degreeUnit(outdoor ?? weather))}</strong></div><span>{weatherLabel(condition)}</span>{!demo && (meteo.error || (live && now.getTime() - live.fetchedAt > 30 * 60_000)) && <small className="home-weather-error">{live ? 'Dernières prévisions conservées' : 'Météo indisponible'}</small>}</button>
+      <div className="home-voice"><VoiceAssistant compact /></div>
+    </section><section className="home-side">{layout.order.filter(key => key !== 'calendar' && visible(key) && cards[key]).map(key => <div className="home-module" data-module={key} key={key}>{cards[key]}</div>)}<HomeServiceShortcuts spotify={visible('spotify') && !showSpotify} vehicle={visible('vehicle') && !showVehicle} /><HomeQuickActions><button className="home-update-button" aria-label={updates.length ? `${updates.length} mise${updates.length > 1 ? 's' : ''} à jour` : 'À jour'} title={updates.length ? `${updates.length} mises à jour` : 'À jour'} onClick={() => setUpdatesOpen(true)} disabled={!updates.length}><Download size={18} />{updates.length > 0 && <small>{updates.length}</small>}</button><HomeCustomization /></HomeQuickActions></section>{visible('calendar') && calendar}</>;
+    }} />
+    {updatesOpen && <UpdateModal updates={updates} name={name} onClose={() => setUpdatesOpen(false)} />}
+  </motion.div>;
 }
 function Tempo({ label, entity }: { label: string; entity?: HassEntity }) { const name = unavailable(entity) ? 'Pas encore annoncée' : tempoName(entity?.state); const key = name.toLowerCase(); const Icon = key.includes('rouge') ? Moon : Sun; return <div className={`tempo ${key}`}><Icon size={18} /><span>{label}</span><b title={name}>{name === 'Pas encore annoncée' ? 'À confirmer' : name}</b></div>; }
 function UpdateModal({ updates, name, onClose }: { updates: HassEntity[]; name: (entity?: HassEntity | string) => string; onClose: () => void }) { const dialog = useDialogFocus(); useEffect(() => { const key = (event: KeyboardEvent) => { if (event.key === 'Escape') onClose(); }; window.addEventListener('keydown', key); return () => window.removeEventListener('keydown', key); }, [onClose]); return <div className="modal-backdrop" role="presentation" onMouseDown={onClose}><motion.section ref={dialog} tabIndex={-1} className="update-modal" role="dialog" aria-modal="true" aria-label="Mises à jour disponibles" initial={{ opacity: 0, scale: .97, y: 14 }} animate={{ opacity: 1, scale: 1, y: 0 }} onMouseDown={event => event.stopPropagation()}><button className="modal-close" onClick={onClose} aria-label="Fermer"><X /></button><h2>{updates.length} mise{updates.length > 1 ? 's' : ''} à jour disponible{updates.length > 1 ? 's' : ''}</h2><div className="update-list">{updates.map(update => <article key={update.entity_id}><Download size={18} /><div><b>{name(update)}</b><span>{String(update.attributes.installed_version ?? 'Version actuelle inconnue')} → {String(update.attributes.latest_version ?? 'Nouvelle version')}</span></div>{Boolean(update.attributes.release_url) && <a href={String(update.attributes.release_url)} target="_blank" rel="noreferrer">Notes</a>}</article>)}</div></motion.section></div>; }

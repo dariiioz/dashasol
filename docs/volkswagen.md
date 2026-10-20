@@ -124,7 +124,7 @@ La provenance et les modifications du client sont dans
 
 ## Vue du véhicule
 
-L’écran principal utilise quatre rendus officiels Volkswagen récupérés via VILMA pour le véhicule connecté : avant, profil, arrière et autre côté. Les PNG sont conservés localement dans `public/vehicles/`, sans identifiant du véhicule ni lien signé. Ils remplacent le modèle géométrique générique. Les boutons changent d’angle avec une transition ; il ne s’agit pas d’un modèle 3D interactif.
+L’écran principal utilise quatre rendus officiels Volkswagen récupérés via VILMA pour le véhicule connecté : avant, profil, arrière et autre côté. Les images WebP optimisées sont servies localement ; les PNG d’origine sont conservés dans `public/vehicles/`, sans identifiant du véhicule ni lien signé. Ils remplacent le modèle géométrique générique. Les boutons changent d’angle avec une transition ; il ne s’agit pas d’un modèle 3D interactif.
 
 La batterie, l’autonomie, la prise, la puissance, la durée restante, l’objectif et le kilométrage apparaissent ensemble. Les détails restent accessibles dans les vues Recharge et Détails. Les valeurs absentes restent indiquées par un tiret.
 
@@ -134,7 +134,7 @@ Le halo ambiant respire au repos. Les impulsions de recharge, les particules et 
 
 Le service lit la borne avec TinyTuya 1.20, via son IP privée et le protocole 3.5. La configuration `charger.json` est conservée dans `.vehicle-data/` avec les permissions 0600 ; elle contient `id`, `ip`, `key` et `version`. Aucun secret n’est renvoyé au navigateur. Réserver l’IP de la borne dans le routeur évite un changement d’adresse DHCP.
 
-`GET /api/vehicle/charger` exige la session Volkswagen locale et l’en-tête habituel. Les lectures sont sérialisées et mises en cache 15 secondes. Le navigateur consulte uniquement lorsque la page est visible. Une erreur conserve le dernier relevé et sa date, avec l’indication hors ligne ; les effets de charge s’arrêtent après 45 secondes sans lecture fraîche.
+`GET /api/vehicle/charger` ne dépend plus de la session Volkswagen. Il conserve l’en-tête requis et le contrôle de l’origine de la requête. Cet accès en lecture seule est destiné aux clients de confiance de l’application ; en production, protéger le reverse proxy qui expose le service local. Les lectures sont sérialisées et mises en cache 15 secondes. Le navigateur consulte uniquement lorsque la page est visible. Une erreur conserve le dernier relevé et sa date, avec l’indication hors ligne ; les effets de charge s’arrêtent après 45 secondes sans lecture fraîche.
 
 Les DP 109, 150 et 152 suivent le [profil dé maintenu par Tuya Local](https://github.com/make-all/tuya-local/blob/main/custom_components/tuya_local/devices/dewall_evcharger.yaml). Le JSON du DP 102 contient la puissance totale en watts, l’énergie de session en Wh, la température en dixièmes de degré et les tensions/intensités par phase en dixièmes de V/A, selon les [relevés du protocole de cette famille](https://github.com/make-all/tuya-local/issues/5107). L’énergie cumulée et l’historique compact du DP 105 ne sont pas affichés, leurs unités n’étant pas suffisamment établies pour cette version. La consigne en ampères reste distincte de l’intensité mesurée. Seule la méthode `status()` est appelée : aucun démarrage, arrêt, réglage ou commande de rafraîchissement n’est envoyé.
 

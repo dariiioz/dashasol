@@ -1,14 +1,14 @@
 import { useEffect, useRef } from 'react';
 
 /** Keep keyboard navigation in the open dialog and return focus to its launcher. */
-export function useDialogFocus() {
+export function useDialogFocus(initialFocusSelector?: string) {
   const dialog = useRef<HTMLElement>(null);
   useEffect(() => {
     const previous = document.activeElement as HTMLElement | null;
     const node = dialog.current;
     if (!node) return;
     const focusable = () => Array.from(node.querySelectorAll<HTMLElement>('button:not(:disabled), a[href], input:not(:disabled), select:not(:disabled), textarea:not(:disabled), [tabindex="0"]')).filter(element => element.getClientRects().length > 0);
-    const first = node.querySelector<HTMLElement>('button:not(:disabled), input:not(:disabled)');
+    const first = (initialFocusSelector ? node.querySelector<HTMLElement>(initialFocusSelector) : undefined) ?? node.querySelector<HTMLElement>('button:not(:disabled), input:not(:disabled)');
     first?.focus();
     const trap = (event: KeyboardEvent) => {
       if (event.key !== 'Tab') return;
@@ -19,7 +19,7 @@ export function useDialogFocus() {
       else if (!event.shiftKey && (document.activeElement === last || !node.contains(document.activeElement))) { event.preventDefault(); first.focus(); }
     };
     node.addEventListener('keydown', trap);
-    return () => { node.removeEventListener('keydown', trap); if (previous?.isConnected) previous.focus(); };
-  }, []);
+    return () => { node.removeEventListener('keydown', trap); if (previous?.isConnected) { const target = previous.matches(':disabled') ? previous.closest('article')?.querySelector<HTMLElement>('button:not(:disabled)') : previous; target?.focus(); } };
+  }, [initialFocusSelector]);
   return dialog;
 }

@@ -17,11 +17,11 @@ export function useCharger(enabled: boolean) {
         const next = await response.json() as ChargerStatus;
         if (typeof next.configured !== 'boolean' || typeof next.online !== 'boolean') throw new Error('Invalid response');
         if (!stopped) setStatus(next);
-      } catch { if (!stopped) setStatus(previous => ({ ...previous, configured: previous?.configured ?? true, online: false, data: previous?.data ?? null, message: 'Connexion locale à la borne indisponible.' })); }
+      } catch { if (!stopped) setStatus(previous => ({ ...previous, configured: previous?.configured ?? true, online: false, data: previous?.data ?? null, message: 'Service local de la borne indisponible.' })); }
       finally { clearTimeout(timeout); busy = false; }
     };
-    void read(); const timer = window.setInterval(read, 15000); document.addEventListener('visibilitychange', read); window.addEventListener('online', read);
-    return () => { stopped = true; controller?.abort(); clearInterval(timer); document.removeEventListener('visibilitychange', read); window.removeEventListener('online', read); };
+    void read(); const timer = window.setInterval(read, 15000); document.addEventListener('visibilitychange', read); window.addEventListener('online', read); window.addEventListener('domoryx-charger-refresh', read);
+    return () => { stopped = true; controller?.abort(); clearInterval(timer); document.removeEventListener('visibilitychange', read); window.removeEventListener('online', read); window.removeEventListener('domoryx-charger-refresh', read); };
   }, [enabled]);
   return status;
 }

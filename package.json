@@ -1,7 +1,7 @@
 {
   "name": "maison-domoryx",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
   "scripts": {
     "dev": "node scripts/dev.mjs",
@@ -10,8 +10,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "vehicle:setup": "node scripts/setup-vehicle.mjs",
-    "vehicle:serve": ".venv-vehicle/bin/python server/vehicle/app.py",
-    "vehicle:test": ".venv-vehicle/bin/python -m unittest discover -s server/vehicle -p \"test_*.py\"",
+    "vehicle:serve": "node scripts/vehicle.mjs serve",
+    "vehicle:test": "node scripts/vehicle.mjs test",
     "eufy:serve": "node server/eufy/server.mjs",
     "eufy:test": "node --test server/eufy/server.check.mjs"
   },

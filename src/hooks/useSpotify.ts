@@ -30,8 +30,8 @@ export function useSpotifyCallback() {
   }, [notify, setSpotify]);
 }
 type Status = 'disconnected' | 'loading' | 'ready' | 'idle' | 'error';
-/** Polls the player only while the music page is on screen: Spotify rate-limits, and a wall display must not hammer it. */
-export function useSpotifyPlayer(active: boolean) {
+/** Polls the player only while its view is active and the browser is visible: Spotify rate-limits, and a wall display must not hammer it. */
+export function useSpotifyPlayer(active: boolean, { library = true, pollInterval = 5000 }: { library?: boolean; pollInterval?: number } = {}) {
   const spotify = useAppStore(s => s.spotify); const connected = Boolean(configuredClientId(spotify.clientId) && spotify.refreshToken);
   const [now, setNow] = useState<SpotifyNow>(); const [devices, setDevices] = useState<SpotifyDevice[]>([]); const [playlists, setPlaylists] = useState<SpotifyPlaylist[]>([]); const [status, setStatus] = useState<Status>(connected ? 'loading' : 'disconnected'); const [detail, setDetail] = useState<string>();
   const timer = useRef<number>(undefined); const pending = useRef(false);
@@ -41,15 +41,27 @@ export function useSpotifyPlayer(active: boolean) {
     catch (failure) { const error = failure as SpotifyError; setStatus(error.status === 404 ? 'idle' : 'error'); setDetail(error.message); }
     finally { pending.current = false; }
   }, []);
-  useEffect(() => { if (!connected || !active) return; void read(); const tick = () => { timer.current = window.setTimeout(async () => { await read(); tick(); }, 5000); }; tick(); return () => window.clearTimeout(timer.current); }, [active, connected, read]);
-  useEffect(() => { if (!connected || !active) return; void spotifyClient.devices().then(payload => setDevices(payload?.devices ?? [])).catch(() => setDevices([])); }, [active, connected, now?.device]);
+  useEffect(() => {
+    if (!connected || !active) return;
+    let stopped = false; let reading = false;
+    const visible = () => document.visibilityState !== 'hidden';
+    const tick = async () => {
+      if (stopped || reading || !visible()) return;
+      reading = true; await read(); reading = false;
+      if (!stopped && visible()) timer.current = window.setTimeout(() => void tick(), pollInterval);
+    };
+    const visibility = () => { window.clearTimeout(timer.current); if (visible()) void tick(); };
+    void tick(); document.addEventListener('visibilitychange', visibility);
+    return () => { stopped = true; window.clearTimeout(timer.current); document.removeEventListener('visibilitychange', visibility); };
+  }, [active, connected, read, pollInterval]);
+  useEffect(() => { if (!connected || !active || !library) return; void spotifyClient.devices().then(payload => setDevices(payload?.devices ?? [])).catch(() => setDevices([])); }, [active, connected, now?.device, library]);
   const command = useCallback(async (action: (client: SpotifyClient) => Promise<unknown>) => {
     try { await action(spotifyClient); setDetail(undefined); }
     catch (failure) { const error = failure as SpotifyError; setDetail(error.message); setStatus(error.status === 404 ? 'idle' : 'error'); return false; }
     window.setTimeout(() => void read(), 350); return true;
   }, [read]);
   /** Playlists barely change: read once per visit rather than on every poll. */
-  useEffect(() => { if (!connected || !active) return; void spotifyClient.playlists().then(payload => setPlaylists(toPlaylists(payload?.items))).catch((failure: SpotifyError) => { setPlaylists([]); if (failure.status === 403) setDetail('Reconnectez Spotify dans les Réglages pour autoriser l’accès à vos playlists.'); }); }, [active, connected]);
+  useEffect(() => { if (!connected || !active || !library) return; void spotifyClient.playlists().then(payload => setPlaylists(toPlaylists(payload?.items))).catch((failure: SpotifyError) => { setPlaylists([]); if (failure.status === 403) setDetail('Reconnectez Spotify dans les Réglages pour autoriser l’accès à vos playlists.'); }); }, [active, connected, library]);
   /** Nothing playing means no active device: aim the first one Spotify knows rather than failing. */
   const target = useCallback(() => (devices.find(item => item.is_active) ?? devices[0])?.id ?? undefined, [devices]);
   const start = useCallback((contextUri: string) => command(client => client.playContext(contextUri, target())), [command, target]);

@@ -1,3 +1,5 @@
+import { confirmAction } from '../stores/confirmationStore';
+import { callHomeAssistantService } from './useHomeAssistant';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useAppStore } from '../stores/appStore';
 import { defaultAssistantModel } from '../stores/config';
@@ -15,11 +17,14 @@ const MAX_ROUNDS = 4;
 /** Just enough memory for "et dans la chambre ?" to mean something, not enough to grow the prompt all day. */
 const MEMORY = 6;
 const houseContext = (): HouseContext => { const state = useAppStore.getState(); return { entities: state.entities, dashboard: state.dashboard, mapping: state.mapping, labels: state.labels, homeName: state.config?.homeName }; };
-async function execute(plan: ToolPlan, demo: boolean) {
+async function execute(plan: ToolPlan, demo: boolean, signal?: AbortSignal) {
   if (demo) return `${plan.confirmation} (mode démonstration : rien n’a été envoyé à la maison)`;
   const client = getHomeAssistantClient();
   if (!client) throw new Error('Home Assistant n’est pas connecté.');
-  await client.callService(plan.domain, plan.service, plan.data, { entity_id: plan.entityId });
+  if (['script', 'automation'].includes(plan.domain) && useAppStore.getState().preferences.confirmGlobalActions && !await confirmAction({ title: 'Appliquer la commande proposée ?', description: plan.confirmation }, signal)) throw new Error('Commande annulée.');
+  if (signal?.aborted) throw new DOMException('Annulé', 'AbortError');
+  if (!controllableIds(houseContext()).includes(plan.entityId)) throw new Error('La sélection des équipements a changé.');
+  await callHomeAssistantService(plan.domain, plan.service, plan.data, { entity_id: plan.entityId });
   return plan.confirmation;
 }
 export function useVoiceAssistant() {
@@ -46,7 +51,7 @@ export function useVoiceAssistant() {
           /** Whatever happens — refusal, rejection by Home Assistant — the model is told, so it can say it out loud. */
           let result: string;
           if (!isPlan(outcome)) result = outcome.error;
-          else try { result = await execute(outcome, demoRun); done.push(result); setActions([...done]); }
+          else try { result = await execute(outcome, demoRun, controller.signal); done.push(result); setActions([...done]); }
           catch (failure) { result = `Home Assistant a refusé : ${failure instanceof Error ? failure.message : 'commande impossible'}.`; }
           messages.push({ role: 'tool', tool_call_id: call.id, content: result });
         }

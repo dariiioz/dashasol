@@ -1,0 +1,32 @@
+/* Shared touch controls and service states. */
+.app-confirmation > p { color: var(--muted); line-height: 1.5; font-size: 14px; }
+.app-confirmation > div { display: flex; gap: 10px; }
+.app-confirmation button { flex: 1; min-height: 48px; padding: 10px; border-radius: 12px; background: var(--surface-2); color: var(--text); }
+.app-confirmation button.selected { background: var(--accent); color: var(--bg); }
+.app-confirmation button.danger { color: var(--warm); border: 1px solid var(--warm); }
+.navigation-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.navigation-grid button { display: flex; align-items: center; gap: 10px; min-height: 56px; border-radius: 14px; background: var(--surface-2); color: var(--text); padding: 12px; text-align: left; font-size: 14px; }
+.navigation-grid button svg { color: var(--accent); }
+.navigation-grid button.active { border: 1px solid var(--accent); }
+.rail .night-pause { min-height: 44px; padding: 6px; color: var(--accent); background: var(--surface-2); border-radius: 10px; font-size: 10px; }
+:root[data-night=true] .app-shell, :root[data-night=true] .shopping-drawer-backdrop { filter: brightness(.55); }
+.connection-editor { display: flex; flex-direction: column; gap: 12px; margin-top: 16px; }
+.connection-editor label { display: flex; flex-direction: column; gap: 8px; color: var(--muted); font-size: 13px; }
+.connection-editor input { min-height: 44px; width: 100%; background: var(--surface-2); color: var(--text); border: 1px solid var(--line); border-radius: 10px; padding: 10px; font-size: 16px; }
+.settings-edit-connection, .diagnostics-heading button { min-height: 44px; padding: 8px 12px; background: var(--surface-2); border-radius: 10px; color: var(--accent); }
+.settings-edit-connection { margin-top: 12px; }
+.diagnostics-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.diagnostics-heading h3 { margin-bottom: 0; }
+.service-diagnostics ul { list-style: none; padding: 0; margin: 12px 0 0; }
+.service-diagnostics li { display: grid; grid-template-columns: 8px minmax(85px, .4fr) minmax(0, 1fr); align-items: center; gap: 10px; padding: 12px 0; border-bottom: 1px solid var(--line); font-size: 13px; }
+.service-diagnostics li > span:last-child { color: var(--muted); overflow-wrap: anywhere; }
+.service-dot { width: 7px; height: 7px; background: var(--muted); border-radius: 50%; }
+.service-dot[data-ok=true] { background: var(--accent); }
+.service-unavailable { padding: 20px; border-radius: 18px; background: var(--surface); max-width: 650px; }
+.service-unavailable h2 { font-size: 22px; }
+.service-unavailable p { color: var(--muted); font-size: 14px; line-height: 1.5; }
+.service-unavailable button { min-height: 44px; padding: 8px 12px; margin: 4px; border-radius: 10px; background: var(--surface-2); color: var(--accent); }
+.inline-retry { min-height: 44px; background: none; color: var(--accent); padding: 4px 8px; }
+.settings-selects input[type=time] { min-height: 44px; background: var(--surface-2); color: var(--text); border: 1px solid var(--line); border-radius: 10px; padding: 8px; font-size: 16px; }
+@media(max-width:900px) { .rail nav { width: 100%; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); overflow: visible; } .rail nav button { width: 100%; min-width: 0; min-height: 48px; } .rail nav button span { font-size: 10px; } .rail .night-pause { position: fixed; right: 12px; bottom: 82px; z-index: 30; } }
+@media(min-width:901px) { .rail nav { gap: 6px; } }

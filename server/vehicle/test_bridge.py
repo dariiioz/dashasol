@@ -70,8 +70,11 @@ class BridgeTest(unittest.IsolatedAsyncioTestCase):
         self.bridge.save(self.session)
         path = Path(self.directory.name) / (self.session.sid + ".json")
         self.assertNotIn("private-test-password", path.read_text())
-        self.assertEqual(os.stat(path).st_mode & 0o777, 0o600)
-        self.assertEqual(os.stat(self.directory.name).st_mode & 0o777, 0o700)
+        if os.name != 'nt':
+            self.assertEqual(os.stat(path).st_mode & 0o777, 0o600)
+            self.assertEqual(os.stat(self.directory.name).st_mode & 0o777, 0o700)
+        else:
+            self.assertTrue(os.access(path, os.R_OK | os.W_OK))
 
     async def test_read_payload_does_not_leak_credentials_or_cookies(self):
         self.assertNotIn("password", self.session.public())
@@ -94,7 +97,12 @@ class HttpTest(unittest.IsolatedAsyncioTestCase):
         response = await self.client.get("/api/vehicle/data", headers=self.headers)
         self.assertEqual(response.status, 401)
         response = await self.client.get("/api/vehicle/charger", headers=self.headers)
-        self.assertEqual(response.status, 401)
+        self.assertEqual(response.status, 200)
+        self.assertFalse((await response.json())["configured"])
+        response = await self.client.get("/api/vehicle/charger")
+        self.assertEqual(response.status, 403)
+        response = await self.client.get("/api/vehicle/charger", headers={**self.headers, "Origin": "https://other.example"})
+        self.assertEqual(response.status, 403)
         response = await self.client.get("/api/vehicle/status")
         self.assertEqual(response.status, 403)
         response = await self.client.post("/api/vehicle/login", json={"email": "test@example.org", "password": "test"}, headers={**self.headers, "Origin": "https://other.example"})

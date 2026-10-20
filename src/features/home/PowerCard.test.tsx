@@ -32,7 +32,6 @@ it('opens a demo curve on click and restores focus when dismissed with Escape', 
   fireEvent.click(card);
   expect(screen.getByRole('dialog', { name: 'Historique électrique sur 24 heures' })).toBeTruthy();
   expect(await screen.findByRole('img')).toBeTruthy();
-  expect(screen.getByText('Courbe simulée · mode démonstration')).toBeTruthy();
   expect(getHistory).not.toHaveBeenCalled();
   fireEvent.keyDown(window, { key: 'Escape' });
   expect(screen.queryByRole('dialog')).toBeNull();

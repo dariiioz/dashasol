@@ -5,7 +5,7 @@ import { usePlannerStore } from '../../stores/plannerStore';
 import { useAppStore } from '../../stores/appStore';
 import { PlannerPage } from './PlannerPage';
 vi.mock('../../hooks/useHomeAssistant', () => ({ getHomeAssistantClient: () => undefined }));
-beforeEach(() => { useAppStore.setState({ demo: false, entities: {}, connection: 'offline' }); usePlannerStore.setState({ view: 'shopping', todoSource: 'local', calendarSource: 'local', items: [], events: [] }); });
+beforeEach(() => { useAppStore.setState({ demo: false, entities: {}, connection: 'offline' }); usePlannerStore.setState({ view: 'shopping', selectedDate: '', todoSource: 'local', calendarSource: 'local', items: [], events: [] }); });
 afterEach(cleanup);
 it('adds and checks a local shopping item without losing it on remount', async () => {
   const page = render(<PlannerPage />);
@@ -33,5 +33,5 @@ it('keeps a read-only HA calendar disabled rather than writing locally', () => {
   useAppStore.setState({ connection: 'connected', entities: { 'calendar.tempo': { entity_id: 'calendar.tempo', state: 'off', attributes: { friendly_name: 'Tempo', supported_features: 0 }, last_changed: '', last_updated: '' } } });
   usePlannerStore.setState({ view: 'calendar', calendarSource: 'calendar.tempo' }); render(<PlannerPage />);
   expect((screen.getByRole('button', { name: 'Ajouter un événement' }) as HTMLButtonElement).disabled).toBe(true);
-  expect(screen.getByText(/lecture seule/)).toBeTruthy();
+  expect(screen.getByText(/lecture seule/i)).toBeTruthy();
 });

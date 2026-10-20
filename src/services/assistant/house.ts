@@ -1,3 +1,4 @@
+import { coverCommandKeys, resolveCoverCommand } from '../home-assistant/coverCommands';
 import type { DashboardEntityConfig, EntityLabels, EntityMapping, HassEntity } from '../../types/homeAssistant';
 import { selectedIds } from '../../utils/dashboard';
 import { degreeUnit, nameOf, numberState, unavailable, weatherLabel } from '../../utils/entities';
@@ -5,7 +6,7 @@ export interface HouseContext { entities: Record<string, HassEntity>; dashboard:
 /** A wall tablet holds hundreds of entities: only what the household chose to display is ever named to the model. */
 const SECTION_LIMIT = 25;
 const hvacLabels: Record<string, string> = { heat: 'chauffage', cool: 'climatisation', auto: 'automatique', off: 'éteint', heat_cool: 'chaud/froid', dry: 'déshumidification', fan_only: 'ventilation' };
-const quickActions = (context: HouseContext) => [context.dashboard.automationLower, context.dashboard.automationUpper].flatMap(action => action?.entityId ? [action.entityId] : []);
+const quickActions = (context: HouseContext) => [...new Set(coverCommandKeys.flatMap(key => resolveCoverCommand(key, context.dashboard, context.entities).targets).filter(id => /^(script|automation)\./.test(id)))];
 /** The single list of entity ids the assistant may act on: everything else is invisible to it, and refused if invented. */
 export const controllableIds = (context: HouseContext): string[] => [...new Set([...selectedIds(context.dashboard.climateEntities), ...selectedIds(context.dashboard.coverEntities), ...selectedIds(context.dashboard.mediaEntities), ...quickActions(context)])].filter(id => context.entities[id]);
 const line = (context: HouseContext, id: string, detail: string) => `- ${id} « ${nameOf(context.labels, context.entities[id], id)} » : ${detail}`;

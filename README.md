@@ -1,5 +1,7 @@
 # Domoryx
 
+Version locale **0.2.0** : voir les [changements et instructions des lots 1 et 2](docs/lots-1-2.md) pour la personnalisation de l’accueil, la navigation regroupée, le mode mural et la maintenance des connexions.
+
 PWA tactile et premium pour contrôler Home Assistant depuis un iPad mural. Elle parle directement au protocole WebSocket de Home Assistant : aucun Lovelace, aucune iframe et aucun serveur intermédiaire.
 
 ## Démarrer

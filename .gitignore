@@ -15,3 +15,5 @@ __pycache__/
 *.pyc
 
 .eufy-data/
+output/
+.playwright-cli/

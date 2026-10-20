@@ -9,7 +9,7 @@ import { EufyLiveVideo } from './EufyLiveVideo';
 
 export function DoorbellMonitor() {
   const demo = useAppStore(s => s.demo);
-  const { status } = useEufy(!demo, 1500);
+  const { status } = useEufy(!demo, 3000);
   const open = useDoorbellStore(s => s.open); const openLive = useDoorbellStore(s => s.openLive); const closeLive = useDoorbellStore(s => s.closeLive);
   const armedAt = useRef(Date.now()); const seen = useRef(new Set<string>()); const lastRing = useRef(0);
   useEffect(() => {

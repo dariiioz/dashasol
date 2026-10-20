@@ -309,9 +309,8 @@ class Bridge:
         return response
 
     async def charger_data(self, request):
-        session = self.get(request)
-        if not session or session.phase != "connected":
-            return web.json_response({"error": "Connectez votre compte Volkswagen."}, status=401)
+        # Local, read-only telemetry is independent of Volkswagen cloud login.
+        # The shared origin/header guard still applies to this endpoint.
         return web.json_response(await self.charger.status())
 
     async def close(self, _app):
@@ -334,6 +333,8 @@ class Bridge:
 async def guard(request, handler):
     if request.headers.get("X-Domoryx-Vehicle") != "1":
         response = web.json_response({"error": "Accès refusé."}, status=403)
+    elif request.headers.get("Origin") and urlparse(request.headers["Origin"]).netloc != request.host:
+        response = web.json_response({"error": "Origine de la demande refusée."}, status=403)
     elif request.method == "POST" and (request.content_type != "application/json" or urlparse(request.headers.get("Origin", "")).netloc != request.host):
         response = web.json_response({"error": "Origine de la demande refusée."}, status=403)
     else:

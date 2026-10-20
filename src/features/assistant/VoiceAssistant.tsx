@@ -11,10 +11,10 @@ const readouts: Record<AssistantPhase, string> = { idle: 'En veille', listening:
 const invitations: Record<AssistantPhase, string> = { idle: 'Appuyez, puis parlez.', listening: 'Je vous écoute. Appuyez pour envoyer.', thinking: 'Je consulte la maison…', speaking: 'Je réponds.' };
 const clock = (seconds: number) => `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
 /** Opens from the hero so the wall keeps showing the time and the weather until someone actually asks for something. */
-export function VoiceAssistant() {
+export function VoiceAssistant({ compact = false }: { compact?: boolean } = {}) {
   const [open, setOpen] = useState(false); const configured = assistantConfigured(useAppStore(s => s.assistant.apiKey));
   /** The launcher is a fragment of the dial it opens: the same graduations, at rest, waiting to be spoken to. */
-  return <><button className="assistant-launch" data-ready={configured} onClick={() => setOpen(true)}>
+  return <><button className={`assistant-launch${compact ? ' assistant-launch-compact' : ''}`} aria-label="Parler à la maison" data-ready={configured} onClick={() => setOpen(true)}>
     <span className="launch-dial"><svg className="launch-rings" viewBox="0 0 44 44" aria-hidden="true" focusable="false"><circle className="launch-graduations" cx="22" cy="22" r="19" /><circle className="launch-hairline" cx="22" cy="22" r="13" /></svg><Mic size={15} strokeWidth={1.9} /></span>
     <span className="launch-label">Parler à la maison</span>
   </button>{open && <AssistantPanel configured={configured} onClose={() => setOpen(false)} />}</>;
