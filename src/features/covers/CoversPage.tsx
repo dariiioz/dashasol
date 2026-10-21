@@ -1,3 +1,4 @@
+import { CoverGroups } from '../household/CoverGroups';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { ChevronDown, ChevronUp, Pause, SlidersHorizontal } from 'lucide-react';
 import { useAppStore } from '../../stores/appStore';
@@ -28,7 +29,7 @@ export function CoversPage({ compact = false }: { compact?: boolean } = {}) { co
    finally { busy.current = false; setSending(false); }
  };
  return <section className={`page covers-page${compact ? ' covers-compact' : ''}`}><header className="page-heading"><div className="global-actions"><button disabled={disabled || !grouped.commands.find(command => command.key === 'allOpen')?.targets.length} onClick={() => void grouped.run('allOpen')}>Tout ouvrir</button><button disabled={disabled || !grouped.commands.find(command => command.key === 'allClose')?.targets.length} onClick={() => void grouped.run('allClose')}>Tout fermer</button></div></header>
-  {ids.length ? <><div className="cover-pages" ref={scroller} onScroll={event => { const width = event.currentTarget.clientWidth; if (width) setPage(Math.round(event.currentTarget.scrollLeft / width)); }}>{pages.map((group, index) => <div className="cover-list" key={index}>{group.map(id => <CoverControl key={id} entity={entities[id]} name={name(entities[id] ?? id)} command={command} disabled={disabled} pending={sending} />)}</div>)}</div>
+  {!compact && <CoverGroups disabled={disabled} />}{ids.length ? <><div className="cover-pages" ref={scroller} onScroll={event => { const width = event.currentTarget.clientWidth; if (width) setPage(Math.round(event.currentTarget.scrollLeft / width)); }}>{pages.map((group, index) => <div className="cover-list" key={index}>{group.map(id => <CoverControl key={id} entity={entities[id]} name={name(entities[id] ?? id)} command={command} disabled={disabled} pending={sending} />)}</div>)}</div>
     {pages.length > 1 && <div className="cover-pagination" aria-label="Pages de volets">{pages.map((_, index) => <button key={index} aria-label={`Page ${index + 1}`} aria-current={index === page ? 'page' : undefined} className={index === page ? 'active' : ''} onClick={() => goTo(index)} />)}</div>}</> : <div className="empty-state"><p>Aucun volet n’est encore sélectionné.</p><button onClick={() => useAppStore.getState().setPage('settings')}>Sélectionner mes volets</button></div>}
 </section>; }
 function CoverControl({ entity, name, command, disabled, pending }: { entity?: HassEntity; name: string; command: (id: string, service: string, position?: number) => Promise<boolean>; disabled: boolean; pending: boolean }) {

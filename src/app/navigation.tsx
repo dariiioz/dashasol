@@ -4,9 +4,9 @@ import { QuickDrawer } from '../components/QuickDrawer';
 import { useAppStore } from '../stores/appStore';
 import { navigationFavorites } from '../utils/preferences';
 import type { Page } from '../types/homeAssistant';
-export const pageNames: Record<Page, string> = { home: 'Accueil', energy: 'Énergie', weather: 'Météo', temperatures: 'Températures', heating: 'Chauffage', covers: 'Volets', media: 'Musique', vehicle: 'ID.4', entry: 'Entrée', planner: 'Agenda', settings: 'Réglages' };
-const icons = { home: House, energy: Zap, weather: CloudSun, temperatures: Thermometer, heating: Flame, covers: Blinds, media: Music2, vehicle: CarFront, entry: Bell, planner: CalendarDays, settings: Settings };
-const housePages: Page[] = ['temperatures', 'heating', 'covers', 'energy'];
+export const pageNames: Record<Page, string> = { household: 'Votre maison', home: 'Accueil', energy: 'Énergie', weather: 'Météo', temperatures: 'Températures', heating: 'Chauffage', covers: 'Volets', media: 'Musique', vehicle: 'ID.4', entry: 'Entrée', planner: 'Agenda', settings: 'Réglages' };
+const icons = { household: Grid2X2, home: House, energy: Zap, weather: CloudSun, temperatures: Thermometer, heating: Flame, covers: Blinds, media: Music2, vehicle: CarFront, entry: Bell, planner: CalendarDays, settings: Settings };
+const housePages: Page[] = ['household', 'temperatures', 'heating', 'covers', 'energy'];
 export function Navigation() {
   const active = useAppStore(s => s.activePage); const setPage = useAppStore(s => s.setPage); const preferences = useAppStore(s => s.preferences);
   const [menu, setMenu] = useState<'house' | 'more'>(); const favorites = navigationFavorites(preferences.navigationFavorites);

@@ -6,7 +6,7 @@ export function homeLayout(value?: Partial<HomeLayout>): HomeLayout {
   return { order: [...[...new Set([...(Array.isArray(value?.order) ? value.order.filter(key => homeModules.includes(key)) : []), ...homeModules])].filter(key => key !== 'calendar'), 'calendar'], visibility: Object.fromEntries(Object.entries(value?.visibility ?? {}).filter(([key, mode]) => homeModules.includes(key as HomeModule) && ['auto', 'show', 'hide'].includes(mode))), density: value?.density === 'compact' ? 'compact' : 'comfortable' };
 }
 export function navigationFavorites(value?: Page[]): Page[] {
-  const allowed = ['energy', 'weather', 'temperatures', 'heating', 'covers', 'media', 'vehicle', 'entry', 'planner', 'settings'];
+  const allowed = ['household', 'energy', 'weather', 'temperatures', 'heating', 'covers', 'media', 'vehicle', 'entry', 'planner', 'settings'];
   return [...new Set((Array.isArray(value) ? value : ['planner', 'media']).filter(page => allowed.includes(page)))].slice(0, 2) as Page[];
 }
 export function dashboardIds(dashboard: import('../types/homeAssistant').DashboardEntityConfig): string[] {

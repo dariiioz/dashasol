@@ -20,7 +20,7 @@ import { domainOf, labelOf } from '../../utils/entities';
 
 type Category = 'temperatureEntities' | 'climateEntities' | 'coverEntities' | 'mediaEntities' | 'updateEntities';
 const labels: Record<Category, string> = { temperatureEntities: 'Températures', climateEntities: 'Chauffage', coverEntities: 'Volets', mediaEntities: 'Musique', updateEntities: 'Mises à jour' };
-const startupPages: { value: Page; label: string }[] = [{ value: 'home', label: 'Accueil' }, { value: 'energy', label: 'Énergie' }, { value: 'weather', label: 'Météo' }, { value: 'vehicle', label: 'ID.4' }, { value: 'entry', label: 'Entrée' }, { value: 'planner', label: 'Agenda' }, { value: 'temperatures', label: 'Températures' }, { value: 'heating', label: 'Chauffage' }, { value: 'covers', label: 'Volets' }, { value: 'media', label: 'Musique' }];
+const startupPages: { value: Page; label: string }[] = [{ value: 'household', label: 'Votre maison' }, { value: 'home', label: 'Accueil' }, { value: 'energy', label: 'Énergie' }, { value: 'weather', label: 'Météo' }, { value: 'vehicle', label: 'ID.4' }, { value: 'entry', label: 'Entrée' }, { value: 'planner', label: 'Agenda' }, { value: 'temperatures', label: 'Températures' }, { value: 'heating', label: 'Chauffage' }, { value: 'covers', label: 'Volets' }, { value: 'media', label: 'Musique' }];
 const autoHomeChoices = [{ value: 0, label: 'Jamais' }, { value: 60, label: 'Après 1 min' }, { value: 180, label: 'Après 3 min' }, { value: 300, label: 'Après 5 min' }];
 const fits = (id: string, attributes: Record<string, unknown>, category: Category) => category === 'temperatureEntities' ? (domainOf(id) === 'sensor' && (attributes.device_class === 'temperature' || ['°C', '°F'].includes(String(attributes.unit_of_measurement)))) : domainOf(id) === ({ climateEntities: 'climate', coverEntities: 'cover', mediaEntities: 'media_player', updateEntities: 'update' }[category]);
 const settingsSections = [
@@ -117,9 +117,9 @@ function PowerSettings() {
   const demo = useAppStore(s => s.demo);
   const name = useEntityName();
   const candidates = Object.values(entities).filter(isPowerSensor).sort((a, b) => name(a).localeCompare(name(b), 'fr'));
-  const selected = mapping.power ?? (demo ? 'sensor.maison_puissance' : '');
+  const selected = mapping.power ?? (demo ? 'sensor.maison_puissance' : entities['sensor.lixee_sinsts'] ? 'sensor.lixee_sinsts' : '');
   return <div className="power-settings"><h3>Consommation électrique instantanée</h3><label>Capteur de puissance de la maison<select value={selected} onChange={event => useAppStore.getState().setPowerEntity(event.target.value)}>
     <option value="">Aucun capteur</option>{selected && !candidates.some(entity => entity.entity_id === selected) && <option value={selected}>{name(entities[selected] ?? selected)} · indisponible</option>}
     {candidates.map(entity => <option key={entity.entity_id} value={entity.entity_id}>{name(entity)} · {String(entity.attributes.unit_of_measurement)}</option>)}
-  </select></label><p>Capteur en W ou kW.</p>{!candidates.length && <p>Aucun capteur compatible trouvé dans Home Assistant.</p>}</div>;
+  </select></label><p>Capteur en W, kW ou VA pour Linky.</p>{!candidates.length && <p>Aucun capteur compatible trouvé dans Home Assistant.</p>}</div>;
 }
